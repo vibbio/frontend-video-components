@@ -11,6 +11,8 @@ import { version } from '../../package.json'
 import ReactPlayer from '../ReactPlayer'
 import Duration from './Duration'
 
+import { Range } from 'rc-slider';
+
 const MULTIPLE_SOURCES = [
   { src: 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4', type: 'video/mp4' },
   { src: 'http://clips.vorwaerts-gmbh.de/big_buck_bunny.ogv', type: 'video/ogv' },
@@ -24,6 +26,7 @@ export default class App extends Component {
     volume: 0.8,
     muted: false,
     played: 0,
+    prevSeek: [0, 100],
     loaded: 0,
     duration: 0,
     playbackRate: 1.0,
@@ -64,11 +67,38 @@ export default class App extends Component {
     this.setState({ seeking: true })
   }
   onSeekChange = e => {
-    this.setState({ played: parseFloat(e.target.value) })
+    const seekStart = e[0];
+    const seekEnd = e[1];
+    const prevSeek = this.state.prevSeek;
+
+    const prevSeekStart = prevSeek[0];
+
+    if (seekStart !== prevSeekStart) {
+      const timeFraction = parseFloat(seekStart) / 100;
+      this.setState({ played: timeFraction });
+      this.player.seekTo(parseFloat(timeFraction))
+    } else {
+      const timeFraction = parseFloat(seekEnd) / 100;
+      this.setState({ played: timeFraction });
+      this.player.seekTo(parseFloat(timeFraction))
+    }
+    this.setState({ prevSeek: e })
   }
   onSeekMouseUp = e => {
-    this.setState({ seeking: false })
-    this.player.seekTo(parseFloat(e.target.value))
+    const seekStart = e[0];
+    const seekEnd = e[1];
+    const prevSeek = this.state.prevSeek;
+    const prevSeekStart = prevSeek[0];
+
+    if (seekStart !== prevSeekStart) {
+      const timeFraction = parseFloat(seekStart) / 100;
+      this.setState({ seeking: false });
+      this.player.seekTo(parseFloat(timeFraction))
+    } else {
+      const timeFraction = parseFloat(seekEnd) / 100;
+      this.setState({ seeking: false });
+      this.player.seekTo(parseFloat(timeFraction))
+    }
   }
   onProgress = state => {
     // We only want to update time slider if we are not currently seeking
@@ -103,7 +133,7 @@ export default class App extends Component {
     const {
       url, playing, volume, muted, loop,
       played, loaded, duration,
-      playbackRate,
+      playbackRate, prevSeek,
       soundcloudConfig,
       vimeoConfig,
       youtubeConfig,
@@ -127,6 +157,8 @@ export default class App extends Component {
               playbackRate={playbackRate}
               volume={volume}
               muted={muted}
+              prevSeekStart={parseFloat(prevSeek[0])}
+              prevSeekEnd={parseFloat(prevSeek[1])}
               soundcloudConfig={soundcloudConfig}
               vimeoConfig={vimeoConfig}
               youtubeConfig={youtubeConfig}
@@ -157,11 +189,13 @@ export default class App extends Component {
               </td>
             </tr>
             <tr>
-              <th>Seek</th>
+              <th>Slider</th>
               <td>
-                <input
-                  type='range' min={0} max={1} step='any'
-                  value={played}
+                <Range
+                  allowCross={false}
+                  min={0}
+                  max={100}
+                  defaultValue={[0, 100]}
                   onMouseDown={this.onSeekMouseDown}
                   onChange={this.onSeekChange}
                   onMouseUp={this.onSeekMouseUp}
@@ -300,6 +334,10 @@ export default class App extends Component {
             <tr>
               <th>playing</th>
               <td>{playing ? 'true' : 'false'}</td>
+            </tr>
+            <tr>
+              <th>prevSeek</th>
+              <td>{`${this.state.prevSeek[0]} : ${this.state.prevSeek[1]}`}</td>
             </tr>
             <tr>
               <th>volume</th>

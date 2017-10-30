@@ -10,6 +10,8 @@ export const propTypes = {
   volume: number,
   muted: bool,
   playbackRate: number,
+  prevSeekStart: number,
+  prevSeekEnd: number,
   width: oneOfType([ string, number ]),
   height: oneOfType([ string, number ]),
   style: object,
@@ -70,6 +72,8 @@ export const defaultProps = {
   width: 640,
   height: 360,
   style: {},
+  prevSeekStart: 0,
+  prevSeekEnd: 100,
   progressFrequency: 1000,
   playsinline: false,
   config: {
