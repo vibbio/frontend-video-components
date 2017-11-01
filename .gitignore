@@ -10,5 +10,4 @@ npm-debug.log
 .idea/
 dist/TimeMarker.js
 dist/TimeMarker.js.map
-package-lock.json
 src/time-marker/
