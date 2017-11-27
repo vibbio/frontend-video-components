@@ -169,6 +169,7 @@ export default class FilePlayer extends Component {
         style={style}
         preload='auto'
         controls={controls}
+        controlsList="nodownload"
         loop={loop}
         {...config.file.attributes}>
         {url instanceof Array &&
