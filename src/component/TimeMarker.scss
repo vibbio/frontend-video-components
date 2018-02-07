@@ -1,0 +1,42 @@
+.player-wrapper {
+  width: 100%;
+}
+
+.secondstext{
+    font-size: 1rem;
+    padding: 0.1rem 0;
+    border: 1px solid #00849C;
+    border-radius: 0.2rem;
+    width: 5rem;
+}
+
+.chosen-timestamps {
+	display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 80%;
+    margin: auto;
+}
+
+.time-marker-grid {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.grid-line {
+    position: absolute;
+    height: 30px;
+    width: 1px;
+    background-color: #00849C;
+    top: -15px;
+    z-index: -1;
+}
+
+.grid-line-wrapper {
+    position: relative;
+    opacity: 0.5;
+}
