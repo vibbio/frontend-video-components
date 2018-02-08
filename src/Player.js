@@ -148,9 +148,13 @@ export default class Player extends Component {
       this.props.onPause();
   };
   onEnded = () => {
-      const { activePlayer, loop, onEnded, prevSeekStart } = this.props;
+      const { activePlayer, loop, onEnded, prevSeek } = this.props;
       if (activePlayer.loopOnEnded && loop) {
-          this.seekTo(prevSeekStart); // Seek to prevSeekStart
+          // this.seekTo(prevSeek[0]); // Seek to prevSeekStart
+          const playSeekMarker = this.state.prevSeek[1];
+          const timeFraction = parseFloat(playSeekMarker);
+          const seekTo = timeFraction / (this.state.duration * 1000);
+          this.seekTo(seekTo);
       }
       onEnded();
   };

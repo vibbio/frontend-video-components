@@ -14,7 +14,7 @@ class Range extends React.Component {
         super(props);
 
         const { count, min, max } = props;
-        const initialValue = Array.apply(null, Array(count + 1))
+        const initialValue = Array(...Array(count + 1))
             .map(() => min);
         const defaultValue = 'defaultValue' in props ?
             props.defaultValue : initialValue;
@@ -26,7 +26,7 @@ class Range extends React.Component {
         this.state = {
             handle: null,
             recent,
-            bounds,
+            bounds
         };
     }
 
@@ -77,7 +77,7 @@ class Range extends React.Component {
 
         this.setState({
             handle: boundNeedMoving,
-            recent: boundNeedMoving,
+            recent: boundNeedMoving
         });
 
         const prevValue = bounds[boundNeedMoving];
@@ -115,7 +115,7 @@ class Range extends React.Component {
         }
         this.onChange({
             handle: nextHandle,
-            bounds: nextBounds,
+            bounds: nextBounds
         });
     }
 
@@ -134,7 +134,7 @@ class Range extends React.Component {
             if (value > bounds[i]) { closestBound = i; }
         }
         if (Math.abs(bounds[closestBound + 1] - value) < Math.abs(bounds[closestBound] - value)) {
-            closestBound = closestBound + 1;
+            closestBound += 1;
         }
         return closestBound;
     }
@@ -188,7 +188,7 @@ class Range extends React.Component {
         const { pushable } = this.props;
         let threshold = false;
         if (handle !== 1 && pushable) {
-            threshold = pushable
+            threshold = pushable;
         }
 
         // const { pushable: threshold } = this.props;
@@ -276,7 +276,7 @@ class Range extends React.Component {
     render() {
         const {
             handle,
-            bounds,
+            bounds
         } = this.state;
         const {
             prefixCls,
@@ -288,33 +288,42 @@ class Range extends React.Component {
             handle: handleGenerator,
             trackStyle,
             handleStyle,
+            playedHandleValue
         } = this.props;
 
-        const offsets = bounds.map(v => this.calcOffset(v));
+        const offsets = bounds.map(v => this.calcOffset(v);
 
         const handleClassName = `${prefixCls}-handle`;
-        const handles = bounds.map((v, i) => handleGenerator({
-            className: classNames({
-                [handleClassName]: true,
-                [`${handleClassName}-${i + 1}`]: true,
-            }),
-            vertical,
-            offset: offsets[i],
-            value: v,
-            dragging: handle === i,
-            index: i,
-            min,
-            max,
-            disabled,
-            style: handleStyle[i],
-            ref: h => this.saveHandle(i, h),
-        }));
+        const handles = bounds.map((v, i) => {
+            const isPlayMarkerHandle = i === 1;
+            const dragging = handle === i;
+
+            const offset = (!dragging && isPlayMarkerHandle) ? this.calcOffset(playedHandleValue) : offsets[i];
+
+            return handleGenerator({
+                className: classNames({
+                    [handleClassName]: true,
+                    [`${handleClassName}-${i + 1}`]: true
+                }),
+                vertical,
+                offset,
+                value: v,
+                dragging,
+                index: i,
+                min,
+                max,
+                disabled,
+                style: handleStyle[i],
+                ref: h => this.saveHandle(i, h),
+                playedHandleValue
+            });
+        });
 
         const tracks = bounds.slice(0, -1).map((_, index) => {
             const i = index + 1;
             const trackClassName = classNames({
                 [`${prefixCls}-track`]: true,
-                [`${prefixCls}-track-${i}`]: true,
+                [`${prefixCls}-track-${i}`]: true
             });
             return (
                 <Track

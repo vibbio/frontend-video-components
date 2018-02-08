@@ -7,13 +7,11 @@ import ReactPlayer from '../ReactPlayer';
 import './VideoComponent.scss';
 import Duration from '../demo/Duration';
 
-const zoomOptions = [1, 0.5, 0.25, 0.125];
-// zoom: 100%, 50%, 25%, 12.5%
-
 class VideoComponent extends Component {
     state = {
         url: null,
         playing: true,
+        isPlaying: false,
         volume: 0.8,
         muted: false,
         played: 0,
@@ -27,56 +25,77 @@ class VideoComponent extends Component {
     };
 
     onPlay = () => {
-        this.setState({ playing: true });
+        this.setState({ isPlaying: true });
     };
     onPause = () => {
-        this.setState({ playing: false });
+        this.setState({ isPlaying: false });
     };
     onSeekMouseDown = () => {
-        this.setState({ seeking: true, playing: false });
+        this.setState({ seeking: true, isPlaying: false });
     };
     onSeekChange = (e) => {
         const seekStart = e[0];
-        const seekEnd = e[1];
+        const playSeek = e[1];
+        const seekEnd = e[2];
+
         const prevSeek = this.state.prevSeek;
 
         const prevSeekStart = prevSeek[0];
+        const prevSeekPlay = prevSeek[1];
+        const prevSeekEnd = prevSeek[2];
 
+        let seekTo = 0;
         if (seekStart !== prevSeekStart) {
-            const timeFraction = parseFloat(seekStart) / 100;
-            this.setState({ played: timeFraction });
-            this.player.seekTo(parseFloat(timeFraction));
+            const timeFraction = parseFloat(seekStart);
+            seekTo = timeFraction / (this.state.duration * 1000);
+        } else if (seekEnd !== prevSeekEnd) {
+            const timeFraction = parseFloat(seekEnd);
+            seekTo = timeFraction / (this.state.duration * 1000);
         } else {
-            const timeFraction = parseFloat(seekEnd) / 100;
-            this.setState({ played: timeFraction });
-            this.player.seekTo(parseFloat(timeFraction));
+            const timeFraction = parseFloat(playSeek);
+            seekTo = timeFraction / (this.state.duration * 1000);
         }
-        this.setState({ prevSeek: e, playing: false });
+        this.setState({ played: seekTo });
+        this.player.seekTo(seekTo);
+        this.setState({ prevSeek: e, isPlaying: false });
     };
     setVolume = (e) => {
         this.setState({ volume: parseFloat(e.target.value) });
     };
     onSeekMouseUp = (e) => {
         const seekStart = e[0];
-        const seekEnd = e[1];
+        const playSeek = e[1];
+        const seekEnd = e[2];
+
         const prevSeek = this.state.prevSeek;
+
         const prevSeekStart = prevSeek[0];
+        const prevSeekPlay = prevSeek[1];
+        const prevSeekEnd = prevSeek[2];
 
         if (seekStart !== prevSeekStart) {
-            const timeFraction = parseFloat(seekStart) / 100;
-            this.setState({ seeking: false });
-            this.player.seekTo(parseFloat(timeFraction));
+            this.player.seekTo(parseFloat(seekStart));
+        } else if (seekEnd !== prevSeekEnd) {
+            this.player.seekTo(parseFloat(seekEnd));
         } else {
-            const timeFraction = parseFloat(seekEnd) / 100;
-            this.setState({ seeking: false });
-            this.player.seekTo(parseFloat(timeFraction));
+            this.player.seekTo(parseFloat(playSeek));
         }
+
+        this.setState({ seeking: false, isPlaying: false }); // , playing: true });
     };
     setPlaybackRate = (e) => {
         this.setState({ playbackRate: parseFloat(e.target.value) });
     };
     playPause = () => {
-        this.setState({ playing: !this.state.playing });
+        if (this.state.isPlaying) {
+            this.setState({ isPlaying: false });
+            return;
+        }
+        const playSeekMarker = this.state.prevSeek[1];
+        const timeFraction = parseFloat(playSeekMarker);
+        const seekTo = timeFraction / (this.state.duration * 1000);
+        this.player.seekTo(seekTo);
+        this.setState({ isPlaying: true, played: this.state.prevSeek[1] });
     };
     stop = () => {
         this.setState({ url: null, playing: false });
@@ -117,33 +136,8 @@ class VideoComponent extends Component {
         this.player = player;
     };
 
-    zoomIn = () => {
-        const currentZoom = this.state.zoomLevel;
-        if (currentZoom < zoomOptions.length - 1) {
-            this.setState({ zoomLevel: currentZoom + 1 });
-        }
-    };
-
-    zoomOut = () => {
-        const currentZoom = this.state.zoomLevel;
-        if (currentZoom > 0) {
-            this.setState({ zoomLevel: currentZoom - 1 });
-        }
-    };
-
     render() {
-        const {
-            url, playing, volume, muted, loop, duration,
-            playbackRate, prevSeek, played,
-            vimeoConfig,
-            fileConfig
-        } = this.state;
-
-        const SLIDER_MIN = 0;
-        const SLIDER_MAX = duration;
-
-        // const startTime = this.prettyPrintTimeStamp(((this.state.prevSeek[0] * duration) / SLIDER_MAX) * 1000);
-        // const endTime = this.prettyPrintTimeStamp(((this.state.prevSeek[1] * duration) / SLIDER_MAX) * 1000);
+        const { url, playing, volume, muted, loop, prevSeek, duration, playbackRate, isPlaying, played, fileConfig } = this.state;
 
         const maxValue = duration ? duration * 1000 : 10000;
 
@@ -156,14 +150,12 @@ class VideoComponent extends Component {
                         width="100%"
                         height="100%"
                         url={url}
-                        playing={playing}
+                        playing={isPlaying}
                         loop={loop}
                         playbackRate={playbackRate}
                         volume={volume}
                         muted={muted}
-                        prevSeekStart={parseFloat(prevSeek[0])}
-                        prevSeekEnd={parseFloat(prevSeek[1])}
-                        vimeoConfig={vimeoConfig}
+                        prevSeek={prevSeek}
                         fileConfig={fileConfig}
                         onPlay={this.onPlay}
                         onPause={this.onPause}
@@ -173,7 +165,7 @@ class VideoComponent extends Component {
                     />
                     <div className="play-button-wrapper">
                         <button onClick={this.playPause} className="time-marker-button">
-                            {playing ?
+                            {isPlaying ?
                                 <i className="material-icons">pause</i> :
                                 <i className="material-icons">play_arrow</i>
                             }
@@ -186,8 +178,9 @@ class VideoComponent extends Component {
                             min={0}
                             max={maxValue}
                             count={2}
-                            defaultValue={[0, 1, maxValue]}
+                            defaultValue={[0, 1000, maxValue]}
                             pushable
+                            playedHandleValue={played * maxValue}
                             allowCross={false}
                             trackStyle={[{ backgroundColor: '#00576F' }, { backgroundColor: '#00849c' }]}
                             handleStyle={[
@@ -210,6 +203,9 @@ class VideoComponent extends Component {
                                 }
                             ]}
                             railStyle={{ backgroundColor: '#a8e5e8' }}
+                            onMouseDown={this.onSeekMouseDown}
+                            onChange={this.onSeekChange}
+                            onMouseUp={this.onSeekMouseUp}
                         />
                     )}
                 </div>
@@ -219,11 +215,10 @@ class VideoComponent extends Component {
                             <tr>
                                 <th>YouTube</th>
                                 <td>
-                                    <button onClick={() => this.load('https://www.youtube.com/watch?v=oUFJJNQGwhk')}>
+                                    <button
+                                        onClick={() => this.load('http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4')}
+                                    >
                                         Test A
-                                    </button>
-                                    <button onClick={() => this.load('https://www.youtube.com/watch?v=jNgP6d9HraI')}>
-                                        Test B
                                     </button>
                                 </td>
                             </tr>
@@ -246,7 +241,7 @@ class VideoComponent extends Component {
                             </tr>
                             <tr>
                                 <th>prevSeek</th>
-                                <td>{`${this.state.prevSeek[0]} : ${this.state.prevSeek[1]}`}</td>
+                                <td>{`${this.state.prevSeek[0]} : ${this.state.prevSeek[1]} : ${this.state.prevSeek[2]}`}</td>
                             </tr>
                             <tr>
                                 <th>duration</th>

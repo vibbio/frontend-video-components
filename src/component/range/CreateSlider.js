@@ -52,20 +52,7 @@ export default function createSlider(Component) {
             step: 1,
             marks: {},
             handle({ index, ...restProps }) {
-                const value = 2;
-                // delete restProps.dragging;
-                // return (
-                //     <Tooltip
-                //         prefixCls="rc-slider-tooltip"
-                //         overlay={3}
-                //         visible
-                //         placement="top"
-                //         key={index}
-                //     >
-                //         <Handle value={3} {...restProps} />
-                //     </Tooltip>
-                // );
-                return <Handle index={index} {...restProps} key={index} />; // alue={value} />;
+                return <Handle index={index} {...restProps} key={index} />;
             },
             onBeforeChange: noop,
             onChange: noop,
@@ -286,7 +273,8 @@ export default function createSlider(Component) {
                 style,
                 railStyle,
                 dotStyle,
-                activeDotStyle
+                activeDotStyle,
+                playedHandleValue
             } = this.props;
             const { tracks, handles } = super.render();
 

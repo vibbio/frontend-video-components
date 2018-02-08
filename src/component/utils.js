@@ -13,3 +13,7 @@ export const prettyPrintTimeStamp = (ms) => {
 export const computeMaxValue = (time) => {
 
 }
+
+export const calculatePlayed = (ms) => {
+
+}

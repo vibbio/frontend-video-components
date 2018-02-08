@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import {prettyPrintTimeStamp} from "../utils";
+import { prettyPrintTimeStamp } from '../utils';
 
-export default class Handle extends React.Component {
+class Handle extends Component {
     focus() {
         this.handle.focus();
     }
@@ -16,10 +16,10 @@ export default class Handle extends React.Component {
             index, className, vertical, offset, style, disabled, dragging, min, max, value, ...restProps
         } = this.props;
 
-        const postionStyle = vertical ? { bottom: `${offset}%` } : { left: `${offset}%` };
+        const positionStyle = vertical ? { bottom: `${offset}%` } : { left: `${offset}%` };
         const elStyle = {
             ...style,
-            ...postionStyle,
+            ...positionStyle
         };
         let ariaProps = {};
         if (value !== undefined) {
@@ -28,7 +28,7 @@ export default class Handle extends React.Component {
                 'aria-valuemin': min,
                 'aria-valuemax': max,
                 'aria-valuenow': value,
-                'aria-disabled': !!disabled,
+                'aria-disabled': !!disabled
             };
         }
 
@@ -53,12 +53,16 @@ export default class Handle extends React.Component {
 }
 
 Handle.propTypes = {
+    index: PropTypes.number,
     className: PropTypes.string,
     vertical: PropTypes.bool,
+    dragging: PropTypes.bool,
     offset: PropTypes.number,
     style: PropTypes.object,
     disabled: PropTypes.bool,
     min: PropTypes.number,
     max: PropTypes.number,
-    value: PropTypes.number,
+    value: PropTypes.number
 };
+
+export default Handle;
