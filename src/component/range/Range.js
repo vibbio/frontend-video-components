@@ -291,7 +291,7 @@ class Range extends React.Component {
             playedHandleValue
         } = this.props;
 
-        const offsets = bounds.map(v => this.calcOffset(v);
+        const offsets = bounds.map(v => this.calcOffset(v));
 
         const handleClassName = `${prefixCls}-handle`;
         const handles = bounds.map((v, i) => {
