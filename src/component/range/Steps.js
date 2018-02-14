@@ -17,8 +17,10 @@ const calcPoints = (vertical, marks, dots, step, min, max) => {
     return points;
 };
 
-const Steps = ({ prefixCls, vertical, marks, dots, step, included,
-                   lowerBound, upperBound, max, min, dotStyle, activeDotStyle }) => {
+const Steps = (props) => {
+    const {
+        prefixCls, vertical, marks, dots, step, included, lowerBound, upperBound, max, min, dotStyle, activeDotStyle
+    } = props;
     const range = max - min;
     const elements = calcPoints(vertical, marks, dots, step, min, max).map((point) => {
         const offset = `${Math.abs(point - min) / range * 100}%`;

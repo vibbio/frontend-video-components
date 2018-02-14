@@ -106,6 +106,7 @@ export default function createSlider(Component) {
                 position = handlePosition;
             }
             this.removeDocumentEvents();
+            this.onMouseDownClick();
             this.onStart(position);
             this.addDocumentMouseEvents();
             utils.pauseEvent(e);
@@ -172,6 +173,7 @@ export default function createSlider(Component) {
 
         onMouseUp = () => {
             this.onEnd();
+            this.onMouseUpClick();
             this.removeDocumentEvents();
         }
 
@@ -232,7 +234,7 @@ export default function createSlider(Component) {
         calcValue(offset) {
             const { vertical, min, max } = this.props;
             const ratio = Math.abs(Math.max(offset, 0) / this.getSliderLength());
-            const value = vertical ? (1 - ratio) * (max - min) + min : ratio * (max - min) + min;
+            const value = vertical ? ((1 - ratio) * (max - min)) + min : (ratio * (max - min)) + min;
             return value;
         }
 

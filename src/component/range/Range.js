@@ -94,6 +94,14 @@ class Range extends React.Component {
         this.props.onAfterChange(this.getValue());
     }
 
+    onMouseUpClick = () => {
+        this.props.onMouseUp();
+    }
+
+    onMouseDownClick = () => {
+        this.props.onMouseDown();
+    }
+
     onMove(e, position) {
         utils.pauseEvent(e);
         const props = this.props;
@@ -296,9 +304,20 @@ class Range extends React.Component {
         const handleClassName = `${prefixCls}-handle`;
         const handles = bounds.map((v, i) => {
             const isPlayMarkerHandle = i === 1;
-            const dragging = handle === i;
+            const dragging = (handle !== null) && (handle === i);
 
-            const offset = (!dragging && isPlayMarkerHandle) ? this.calcOffset(playedHandleValue) : offsets[i];
+            const { prevSeek } = this.props;
+            let offset;
+
+            if (isPlayMarkerHandle) {
+                if (!dragging && handle === null) {
+                    offset = this.calcOffset(playedHandleValue);
+                } else {
+                    offset = this.calcOffset(prevSeek[1]);
+                }
+            } else {
+                offset = offsets[i];
+            }
 
             return handleGenerator({
                 className: classNames({
@@ -319,7 +338,41 @@ class Range extends React.Component {
             });
         });
 
-        const tracks = bounds.slice(0, -1).map((_, index) => {
+        const tracks = bounds.slice(0, -1).map((v, index) => {
+            const isLeftPart = index === 0;
+            const isRightPart = index === 1;
+            const dragging = (handle !== null) && (handle === index);
+
+
+            const { prevSeek, isPlaying } = this.props;
+            let leftOffset;
+            let rightOffset;
+
+            if (isLeftPart) {
+                if (isPlaying) {
+                    rightOffset = offsets[index];
+                    leftOffset = this.calcOffset(playedHandleValue);
+                } else if (!dragging) {
+                    rightOffset = offsets[index];
+                    leftOffset = this.calcOffset(prevSeek[1]);
+                } else {
+                    rightOffset = offsets[index];
+                    leftOffset = this.calcOffset(playedHandleValue);
+                }
+            } else if (isRightPart) {
+                if (isPlaying) {
+                    leftOffset = offsets[index+1]
+                    rightOffset = this.calcOffset(playedHandleValue);
+                } else if (!dragging) {
+                    rightOffset = this.calcOffset(prevSeek[1]);
+                    leftOffset = offsets[index + 1];
+                } else {
+
+                    rightOffset = this.calcOffset(prevSeek[1]);
+                    leftOffset = offsets[index + 1];
+                }
+            }
+
             const i = index + 1;
             const trackClassName = classNames({
                 [`${prefixCls}-track`]: true,
@@ -330,8 +383,8 @@ class Range extends React.Component {
                     className={trackClassName}
                     vertical={vertical}
                     included={included}
-                    offset={offsets[i - 1]}
-                    length={offsets[i] - offsets[i - 1]}
+                    offset={rightOffset}
+                    length={leftOffset - rightOffset}
                     style={trackStyle[index]}
                     key={i}
                 />

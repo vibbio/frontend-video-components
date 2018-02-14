@@ -2,8 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import warning from 'warning';
-import Track from './common/Track';
-import createSlider from './common/createSlider';
+import Track from './Track';
+import createSlider from './CreateSlider';
 import * as utils from './utils';
 
 class Slider extends React.Component {

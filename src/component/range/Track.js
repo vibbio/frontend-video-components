@@ -4,18 +4,18 @@ import React from 'react';
 const Track = (props) => {
     const { className, included, vertical, offset, length, style } = props;
 
-    const positonStyle = vertical ? {
+    const positionStyle = vertical ? {
         bottom: `${offset}%`,
-        height: `${length}%`,
+        height: `${length}%`
     } : {
         left: `${offset}%`,
-        width: `${length}%`,
+        width: `${length}%`
     };
 
     const elStyle = {
         visibility: included ? 'visible' : 'hidden',
         ...style,
-        ...positonStyle,
+        ...positionStyle
     };
     return <div className={className} style={elStyle} />;
 };

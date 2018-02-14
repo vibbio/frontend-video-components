@@ -65,20 +65,23 @@ export default class ReactPlayer extends Component {
             const loadedSeconds = this.player.getSecondsLoaded();
             const duration = this.player.getDuration();
             if (duration) {
-                const progress = {
-                    playedSeconds,
-                    played: playedSeconds / duration
-                };
-                if (loadedSeconds !== null) {
-                    progress.loadedSeconds = loadedSeconds;
-                    progress.loaded = loadedSeconds / duration;
+                if (!this.props.seeking) {
+                    const progress = {
+                        playedSeconds,
+                        played: playedSeconds / duration
+                    };
+
+                    if (loadedSeconds !== null) {
+                        progress.loadedSeconds = loadedSeconds;
+                        progress.loaded = loadedSeconds / duration;
+                    }
+                    // Only call onProgress if values have changed
+                    if (progress.played !== this.prevPlayed || progress.loaded !== this.prevLoaded) {
+                        this.props.onProgress(progress);
+                    }
+                    this.prevPlayed = progress.played;
+                    this.prevLoaded = progress.loaded;
                 }
-                // Only call onProgress if values have changed
-                if (progress.played !== this.prevPlayed || progress.loaded !== this.prevLoaded) {
-                    this.props.onProgress(progress);
-                }
-                this.prevPlayed = progress.played;
-                this.prevLoaded = progress.loaded;
             }
         }
         this.progressTimeout = setTimeout(this.progress, this.props.progressFrequency);

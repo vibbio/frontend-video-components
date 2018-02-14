@@ -36,7 +36,7 @@ export default class Player extends Component {
   }
   componentWillReceiveProps(nextProps) {
       // Invoke player methods based on incoming props
-      const { activePlayer, url, playing, volume, muted, playbackRate, prevSeekStart, prevSeekEnd } = this.props;
+      const { activePlayer, url, playing, volume, muted, playbackRate, prevSeek } = this.props;
       if (activePlayer !== nextProps.activePlayer) {
           this.player.stop();
           return; // A new player is coming, so don't invoke any other methods
@@ -62,19 +62,19 @@ export default class Player extends Component {
       if (playbackRate !== nextProps.playbackRate && this.player.setPlaybackRate) {
           this.player.setPlaybackRate(nextProps.playbackRate);
       }
-      if (prevSeekEnd !== nextProps.prevSeekEnd) {
-          this.prevSeekEnd = prevSeekEnd;
-      }
-      if (prevSeekStart !== nextProps.prevSeekStart) {
-          this.prevSeekStart = prevSeekStart;
+      if (prevSeek !== nextProps.prevSeek) {
+          this.prevSeek = prevSeek;
       }
   }
   getCurrentTime() {
       if (!this.isReady) return null;
       const currentTime = this.player.getCurrentTime();
-      const newEnd = (this.prevSeekEnd * this.getDuration()) / 100;
+      let newEnd = this.getDuration();
+      if (this.prevSeek) {
+          newEnd = this.prevSeek[2];
+      }
       if (currentTime > newEnd) {
-          const timeFraction = parseFloat(this.prevSeekStart) / 100;
+          const timeFraction = parseFloat(this.prevSeek[0]) / 100;
           this.seekTo(parseFloat(timeFraction));
           return null;
       }
