@@ -9,6 +9,7 @@ import './VideoComponent.scss';
 class VideoComponent extends Component {
     constructor(props) {
         super(props);
+        this.load = this.load.bind(this);
         this.onSeekMouseDown = this.onSeekMouseDown.bind(this);
         this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
         this.startLoop = this.startLoop.bind(this);
@@ -24,7 +25,9 @@ class VideoComponent extends Component {
         duration: 0,
         playbackRate: 1.0
     };
-
+    componentDidMount() {
+        this.load(this.props.url);
+    }
     onPlay = () => {
         this.setState({ playing: true });
     };
