@@ -5,9 +5,14 @@ import screenfull from 'screenfull';
 import Range from './range/Range';
 import ReactPlayer from '../ReactPlayer';
 import './VideoComponent.scss';
-import Duration from '../demo/Duration';
 
 class VideoComponent extends Component {
+    constructor(props) {
+        super(props);
+        this.onSeekMouseDown = this.onSeekMouseDown.bind(this);
+        this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
+        this.startLoop = this.startLoop.bind(this);
+    }
     state = {
         url: null,
         playing: false,
@@ -19,13 +24,6 @@ class VideoComponent extends Component {
         duration: 0,
         playbackRate: 1.0
     };
-
-    constructor(props) {
-        super(props);
-        this.onSeekMouseDown = this.onSeekMouseDown.bind(this);
-        this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
-        this.startLoop = this.startLoop.bind(this);
-    }
 
     onPlay = () => {
         this.setState({ playing: true });
@@ -228,63 +226,6 @@ class VideoComponent extends Component {
                             playing={playing}
                         />
                     )}
-                </div>
-                <div className="section">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <th>YouTube</th>
-                                <td>
-                                    <button
-                                        onClick={() => this.load('http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4')}
-                                    >
-                                        Test A
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <h2>State</h2>
-
-                    <table>
-                        <tbody>
-                            <tr>
-                                <th>url</th>
-                                <td className={!url ? 'faded' : ''}>
-                                    {(url instanceof Array ? 'Multiple' : url) || 'null'}
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>playing</th>
-                                <td>{playing ? 'true' : 'false'}</td>
-                            </tr>
-                            <tr>
-                                <th>prevSeek</th>
-                                <td>{`${this.state.prevSeek[0]} : ${this.state.prevSeek[1]} : ${this.state.prevSeek[2]}`}</td>
-                            </tr>
-                            <tr>
-                                <th>duration</th>
-                                <td><Duration seconds={duration} /></td>
-                            </tr>
-                            <tr>
-                                <th>elapsed</th>
-                                <td><Duration seconds={duration * played} /></td>
-                            </tr>
-                            <tr>
-                                <th>remaining</th>
-                                <td><Duration seconds={duration * (1 - played)} /></td>
-                            </tr>
-                            <tr>
-                                <th>played</th>
-                                <td>{this.state.played}</td>
-                            </tr>
-                            <tr>
-                                <th>Seeking?</th>
-                                <td>{this.state.seeking}</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
         );
