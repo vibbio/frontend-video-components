@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-expressions */
 
-import SoundCloud from '../../src/players/SoundCloud'
-import YouTube from '../../src/players/YouTube'
-import Vimeo from '../../src/players/Vimeo'
-import Wistia from '../../src/players/Wistia'
+import SoundCloud from '../../src/component/player/players/SoundCloud'
+import YouTube from '../../src/component/player/players/YouTube'
+import Vimeo from '../../src/component/player/players/Vimeo'
+import Wistia from '../../src/component/player/players/Wistia'
 
 const { describe, it, expect } = window
 

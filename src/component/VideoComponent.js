@@ -3,8 +3,8 @@ import { findDOMNode } from 'react-dom';
 import screenfull from 'screenfull';
 
 import Range from './range/Range';
-import ReactPlayer from '../ReactPlayer';
-import './VideoComponent.scss';
+import ReactPlayer from './player/ReactPlayer';
+import './styling/VideoComponent.scss';
 
 class VideoComponent extends Component {
     constructor(props) {

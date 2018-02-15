@@ -1,4 +1,4 @@
-import { parseStartTime, randomString, omit, getConfig } from '../../src/utils'
+import { parseStartTime, randomString, omit, getConfig } from '../../src/component/player/utils'
 
 const { describe, it, expect } = window
 

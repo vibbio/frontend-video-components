@@ -3,7 +3,7 @@
 import React from 'react'
 import { render, unmountComponentAtNode } from 'react-dom'
 
-import ReactPlayer from '../../src/ReactPlayer'
+import ReactPlayer from '../../src/component/player/ReactPlayer'
 
 const { describe, it, expect, beforeEach, afterEach } = window
 
