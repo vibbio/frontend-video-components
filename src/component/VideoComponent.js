@@ -26,7 +26,7 @@ class VideoComponent extends Component {
         playbackRate: 1.0
     };
     componentDidMount() {
-        this.load(this.props.url);
+        this.load(this.props.url, this.props.startTime, this.props.endTime);
     }
     onPlay = () => {
         this.setState({ playing: true });
@@ -127,12 +127,15 @@ class VideoComponent extends Component {
     toggleMuted = () => {
         this.setState({ muted: !this.state.muted });
     };
-    load = (url) => {
+    load = (url, startTime, endTime) => {
+        const prevSeekStart = startTime ? Math.floor(startTime * 1000) : 0;
+        const prevSeekEnd = endTime ? Math.floor(endTime * 1000) : this.state.duration;
+
         this.setState({
             url,
             played: 0,
             loaded: 0,
-            prevSeek: [0, 0, this.state.duration]
+            prevSeek: [prevSeekStart, prevSeekStart + 10, prevSeekEnd]
         });
     };
     onProgress = (state) => {
@@ -159,6 +162,7 @@ class VideoComponent extends Component {
     };
 
     render() {
+        const { timeMarkerButtonFunction } = this.props;
         const {
             url, playing, volume, muted, prevSeek, duration, playbackRate, played, fileConfig
         } = this.state;
@@ -201,9 +205,9 @@ class VideoComponent extends Component {
                             min={0}
                             max={maxValue}
                             count={2}
-                            defaultValue={[0, 0, maxValue]}
+                            defaultValue={[prevSeek[0], prevSeek[1] + 100, prevSeek[2]]}
                             pushable
-                            playedHandleValue={played * maxValue}
+                            playedHandleValue={played ? played * maxValue : prevSeek[1]}
                             allowCross={false}
                             trackStyle={[{ backgroundColor: '#00576F' }, { backgroundColor: '#00849c' }]}
                             handleStyle={[
@@ -230,6 +234,13 @@ class VideoComponent extends Component {
                         />
                     )}
                 </div>
+
+                <button
+                    onClick={() => timeMarkerButtonFunction(prevSeek)}
+                    className="time-marker-modal-content-button"
+                >
+                    Apply section
+                </button>
             </div>
         );
     }
