@@ -8,12 +8,3 @@ export const prettyPrintTimeStamp = (ms) => {
     }
     return moment(ms).format('mm:ss.SS');
 };
-
-
-export const computeMaxValue = (time) => {
-
-}
-
-export const calculatePlayed = (ms) => {
-
-}

@@ -333,8 +333,7 @@ class Range extends React.Component {
                 max,
                 disabled,
                 style: handleStyle[i],
-                ref: h => this.saveHandle(i, h),
-                playedHandleValue
+                ref: h => this.saveHandle(i, h)
             });
         });
 
@@ -344,12 +343,13 @@ class Range extends React.Component {
             const dragging = (handle !== null) && (handle === index);
 
 
-            const { prevSeek, isPlaying } = this.props;
+            const { prevSeek, playing } = this.props;
             let leftOffset;
             let rightOffset;
 
+
             if (isLeftPart) {
-                if (isPlaying) {
+                if (playing) {
                     rightOffset = offsets[index];
                     leftOffset = this.calcOffset(playedHandleValue);
                 } else if (!dragging) {
@@ -360,16 +360,15 @@ class Range extends React.Component {
                     leftOffset = this.calcOffset(playedHandleValue);
                 }
             } else if (isRightPart) {
-                if (isPlaying) {
-                    leftOffset = offsets[index+1]
+                if (playing) {
+                    leftOffset = offsets[index + 1];
                     rightOffset = this.calcOffset(playedHandleValue);
                 } else if (!dragging) {
                     rightOffset = this.calcOffset(prevSeek[1]);
                     leftOffset = offsets[index + 1];
                 } else {
-
-                    rightOffset = this.calcOffset(prevSeek[1]);
                     leftOffset = offsets[index + 1];
+                    rightOffset = this.calcOffset(playedHandleValue);
                 }
             }
 

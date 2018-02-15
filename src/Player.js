@@ -13,8 +13,7 @@ export default class Player extends Component {
   isPlaying = false; // Track playing state internally to prevent bugs
   startOnPlay = true;
   seekOnPlay = null;
-  prevSeekEnd = 100;
-  prevSeekStart = 0;
+  prevSeekEnd = undefined;
   componentDidMount() {
       this.mounted = true;
       this.player.load(this.props.url);
@@ -36,7 +35,7 @@ export default class Player extends Component {
   }
   componentWillReceiveProps(nextProps) {
       // Invoke player methods based on incoming props
-      const { activePlayer, url, playing, volume, muted, playbackRate, prevSeek } = this.props;
+      const { activePlayer, url, playing, volume, muted, playbackRate } = this.props;
       if (activePlayer !== nextProps.activePlayer) {
           this.player.stop();
           return; // A new player is coming, so don't invoke any other methods
@@ -62,21 +61,22 @@ export default class Player extends Component {
       if (playbackRate !== nextProps.playbackRate && this.player.setPlaybackRate) {
           this.player.setPlaybackRate(nextProps.playbackRate);
       }
-      if (prevSeek !== nextProps.prevSeek) {
-          this.prevSeek = prevSeek;
-      }
   }
   getCurrentTime() {
       if (!this.isReady) return null;
       const currentTime = this.player.getCurrentTime();
+
       let newEnd = this.getDuration();
-      if (this.prevSeek) {
-          newEnd = this.prevSeek[2];
+      if (this.props.prevSeek) {
+          newEnd = this.props.prevSeek[2] / 1000.0;
       }
-      if (currentTime > newEnd) {
-          const timeFraction = parseFloat(this.prevSeek[0]) / 100;
-          this.seekTo(parseFloat(timeFraction));
-          return null;
+      if ((currentTime) > newEnd) {
+          const timeFraction = parseFloat(this.props.prevSeek[0]);
+          const seekTo = timeFraction / (this.getDuration() * 1000);
+          this.seekTo(seekTo);
+          this.props.startLoop(seekTo);
+          this.onPlay();
+          return this.player.getCurrentTime();
       }
       return currentTime;
   }
@@ -148,14 +148,11 @@ export default class Player extends Component {
       this.props.onPause();
   };
   onEnded = () => {
-      const { activePlayer, loop, onEnded, prevSeek } = this.props;
-      if (activePlayer.loopOnEnded && loop) {
-          // this.seekTo(prevSeek[0]); // Seek to prevSeekStart
-          const playSeekMarker = this.state.prevSeek[1];
-          const timeFraction = parseFloat(playSeekMarker);
-          const seekTo = timeFraction / (this.state.duration * 1000);
-          this.seekTo(seekTo);
-      }
+      const { onEnded } = this.props;
+      const timeFraction = parseFloat(this.props.prevSeek[0]);
+      const seekTo = timeFraction / (this.getDuration() * 1000);
+      this.seekTo(seekTo);
+      this.onPlay();
       onEnded();
   };
   onDurationCheck = () => {

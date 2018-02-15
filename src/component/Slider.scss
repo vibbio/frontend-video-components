@@ -309,9 +309,14 @@
   border-top-color: #6c6c6c;
 }
 
+.handle-wrapper {
+  position: relative;
+  margin-left: -7px;
+}
+
 
 .handle-value {
-  background: rgba(0, 132, 156, 0.5);
+  background: rgba(38, 54, 69, 0.5);
   height: 25px;
   min-width: 60px;
   display: flex;
@@ -320,4 +325,16 @@
   position: absolute;
   top: 26px;
   left: -31px;
+  border-radius: 3px;
+  color: white;
 }
+
+.handle-1 {
+  margin-left: 0;
+  z-index: 3;
+  .handle-value {
+    top: -37px;
+    margin-left: 0;
+  }
+}
+

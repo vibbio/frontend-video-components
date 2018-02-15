@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 import React from 'react';
+import PT from 'prop-types';
 
 const Track = (props) => {
     const { className, included, vertical, offset, length, style } = props;
@@ -18,6 +18,15 @@ const Track = (props) => {
         ...positionStyle
     };
     return <div className={className} style={elStyle} />;
+};
+
+Track.propTypes = {
+    className: PT.string,
+    offset: PT.number,
+    length: PT.number,
+    style: PT.object,
+    included: PT.bool,
+    vertical: PT.bool
 };
 
 export default Track;

@@ -10,8 +10,7 @@ import Duration from '../demo/Duration';
 class VideoComponent extends Component {
     state = {
         url: null,
-        playing: true,
-        isPlaying: false,
+        playing: false,
         volume: 0.8,
         muted: false,
         played: 0,
@@ -20,24 +19,26 @@ class VideoComponent extends Component {
         loaded: 0,
         duration: 0,
         playbackRate: 1.0,
-        loop: true,
         zoomLevel: 0
     };
 
     constructor(props) {
         super(props);
         this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
+        this.startLoop = this.startLoop.bind(this);
     }
 
     onPlay = () => {
-        this.setState({ isPlaying: true });
+        this.setState({ playing: true });
     };
     onPause = () => {
-        this.setState({ isPlaying: false });
+        this.setState({ playing: false });
     };
+    startLoop = (loopStart) => {
+        this.setState({ played: loopStart });
+    }
     onSeekMouseDown = () => {
         // Start seeking, update how long we have played
-        console.log('onSeek Mouse down');
         const playedAsSeek = this.state.played * 1000 * this.state.duration;
 
         const prevSeek = [
@@ -45,7 +46,7 @@ class VideoComponent extends Component {
             playedAsSeek,
             this.state.prevSeek[2]
         ];
-        this.setState({ seeking: true, isPlaying: false, prevSeek });
+        this.setState({ seeking: true, playing: false, prevSeek });
     };
     onSeekChange = (e) => {
         const seekStart = e[0];
@@ -87,25 +88,26 @@ class VideoComponent extends Component {
             this.setState({ played: seekTo });
         }
         this.player.seekTo(seekTo);
-        this.setState({ seeking: true, prevSeek: updatedPrevSeek, isPlaying: false });
+        this.setState({ seeking: true, prevSeek: updatedPrevSeek, playing: false });
     };
     onSeekMouseUp = () => {
         const prevSeek = this.state.prevSeek;
-        console.log('onSeekMouseUp, prevSeek: ', prevSeek);
         const prevSeekPlay = prevSeek[1];
         const timeFraction = parseFloat(prevSeekPlay);
         const seekTo = timeFraction / (this.state.duration * 1000);
         this.player.seekTo(seekTo);
-        this.setState({ seeking: false, isPlaying: false }); // , playing: true });
+        this.setState({ seeking: false, playing: false });
     };
+
     setVolume = (e) => {
         this.setState({ volume: parseFloat(e.target.value) });
     };
+
     setPlaybackRate = (e) => {
         this.setState({ playbackRate: parseFloat(e.target.value) });
     };
     playPause = () => {
-        if (this.state.isPlaying) {
+        if (this.state.playing) {
             const playedAsSeek = this.state.played * 1000 * this.state.duration;
 
             const prevSeek = [
@@ -113,20 +115,17 @@ class VideoComponent extends Component {
                 playedAsSeek,
                 this.state.prevSeek[2]
             ];
-            this.setState({ isPlaying: false, prevSeek });
+            this.setState({ playing: false, prevSeek });
             return;
         }
         const playSeekMarker = this.state.prevSeek[1];
         const timeFraction = parseFloat(playSeekMarker);
         const seekTo = timeFraction / (this.state.duration * 1000);
         this.player.seekTo(seekTo);
-        this.setState({ isPlaying: true, played: seekTo, seeking: false });
+        this.setState({ playing: true, played: seekTo, seeking: false });
     };
     stop = () => {
         this.setState({ url: null, playing: false });
-    };
-    toggleLoop = () => {
-        this.setState({ loop: !this.state.loop });
     };
     toggleMuted = () => {
         this.setState({ muted: !this.state.muted });
@@ -136,7 +135,7 @@ class VideoComponent extends Component {
             url,
             played: 0,
             loaded: 0,
-            prevSeek: [0, 1000, this.state.duration]
+            prevSeek: [0, 0, this.player.duration]
         });
     };
     onProgress = (state) => {
@@ -164,10 +163,10 @@ class VideoComponent extends Component {
 
     render() {
         const {
-            url, playing, volume, muted, loop, prevSeek, duration, playbackRate, isPlaying, played, fileConfig
+            url, playing, volume, muted, prevSeek, duration, playbackRate, played, fileConfig
         } = this.state;
 
-        const maxValue = duration ? duration * 1000 : 10000;
+        const maxValue = Math.floor(duration ? duration * 1000 : 10000);
         return (
             <div className="time-marker-modal-content">
                 <div className="player-wrapper">
@@ -177,23 +176,22 @@ class VideoComponent extends Component {
                         width="100%"
                         height="100%"
                         url={url}
-                        playing={isPlaying}
-                        loop={loop}
+                        playing={playing}
                         playbackRate={playbackRate}
                         volume={volume}
                         muted={muted}
                         seeking={this.state.seeking}
                         prevSeek={prevSeek}
                         fileConfig={fileConfig}
+                        startLoop={this.startLoop}
                         onPlay={this.onPlay}
                         onPause={this.onPause}
-                        onEnded={() => this.setState({ playing: loop })}
                         onProgress={this.onProgress}
                         onDuration={newDuration => this.setState({ duration: newDuration })}
                     />
                     <div className="play-button-wrapper">
                         <button onClick={this.playPause} className="time-marker-button">
-                            {isPlaying ?
+                            {playing ?
                                 <i className="material-icons">pause</i> :
                                 <i className="material-icons">play_arrow</i>
                             }
@@ -206,28 +204,24 @@ class VideoComponent extends Component {
                             min={0}
                             max={maxValue}
                             count={2}
-                            defaultValue={[0, 1000, maxValue]}
+                            defaultValue={[0, 0, maxValue]}
                             pushable
                             playedHandleValue={played * maxValue}
                             allowCross={false}
                             trackStyle={[{ backgroundColor: '#00576F' }, { backgroundColor: '#00849c' }]}
                             handleStyle={[
                                 {
-                                    height: '30px',
-                                    width: '4px',
-                                    borderRadius: '0px',
-                                    marginLeft: 0,
-                                    marginTop: '-13px'
+                                    height: '20px',
+                                    width: '20px',
+                                    borderRadius: '20px'
                                 },
                                 {
                                     marginTop: '-2px'
                                 },
                                 {
-                                    height: '30px',
-                                    width: '4px',
-                                    borderRadius: '0px',
-                                    marginLeft: '-4px',
-                                    marginTop: '-13px'
+                                    height: '20px',
+                                    width: '20px',
+                                    borderRadius: '20px'
                                 }
                             ]}
                             railStyle={{ backgroundColor: '#a8e5e8' }}
@@ -235,7 +229,7 @@ class VideoComponent extends Component {
                             onChange={this.onSeekChange}
                             onMouseUp={this.onSeekMouseUp}
                             prevSeek={prevSeek}
-                            isPlaying={isPlaying}
+                            playing={playing}
                         />
                     )}
                 </div>

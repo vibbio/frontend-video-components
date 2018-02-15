@@ -65,7 +65,6 @@ export interface Config {
 export interface ReactPlayerProps {
   url?: string | string[] | SourceProps[];
   playing?: boolean;
-  loop?: boolean;
   controls?: boolean;
   volume?: number;
   muted?: boolean;

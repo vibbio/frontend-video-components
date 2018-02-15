@@ -5,7 +5,6 @@ import { getConfig, omit, isObject } from './utils';
 import players from './players';
 import Player from './Player';
 import FilePlayer from './players/FilePlayer';
-import renderPreloadPlayers from './preload';
 
 const SUPPORTED_PROPS = Object.keys(propTypes);
 
@@ -122,10 +121,9 @@ export default class ReactPlayer extends Component {
         const { url, style, width, height } = this.props;
         const otherProps = omit(this.props, SUPPORTED_PROPS, DEPRECATED_CONFIG_PROPS);
         const activePlayer = this.renderActivePlayer(url);
-        const preloadPlayers = renderPreloadPlayers(url, this.config);
         return (
             <div ref={this.wrapperRef} style={{ ...style, width, height }} {...otherProps}>
-                {[activePlayer, ...preloadPlayers]}
+                {[activePlayer]}
             </div>
         );
     }

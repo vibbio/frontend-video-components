@@ -275,8 +275,7 @@ export default function createSlider(Component) {
                 style,
                 railStyle,
                 dotStyle,
-                activeDotStyle,
-                playedHandleValue
+                activeDotStyle
             } = this.props;
             const { tracks, handles } = super.render();
 
