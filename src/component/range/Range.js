@@ -92,15 +92,15 @@ class Range extends React.Component {
         this.setState({ handle: null });
         this.removeDocumentEvents();
         this.props.onAfterChange(this.getValue());
-    }
+    };
 
     onMouseUpClick = () => {
         this.props.onMouseUp();
-    }
+    };
 
     onMouseDownClick = () => {
         this.props.onMouseDown();
-    }
+    };
 
     onMove(e, position) {
         utils.pauseEvent(e);
@@ -114,7 +114,8 @@ class Range extends React.Component {
         const nextBounds = [...state.bounds];
         nextBounds[state.handle] = value;
         let nextHandle = state.handle;
-        if (props.pushable !== false || nextHandle === 1) {
+        const pushableOn = false; // props.pushable;
+        if (pushableOn && (nextHandle === 0 || nextHandle === 2)) {
             const originalValue = state.bounds[nextHandle];
             this.pushSurroundingHandles(nextBounds, nextHandle, originalValue);
         } else if (props.allowCross) {
@@ -193,13 +194,7 @@ class Range extends React.Component {
     }
 
     pushSurroundingHandles(bounds, handle, originalValue) {
-        const { pushable } = this.props;
-        let threshold = false;
-        if (handle !== 1 && pushable) {
-            threshold = pushable;
-        }
-
-        // const { pushable: threshold } = this.props;
+        const { pushable: threshold } = this.props;
         const value = bounds[handle];
 
         let direction = 0;
@@ -213,7 +208,7 @@ class Range extends React.Component {
         if (direction === 0) { return; }
 
         const nextHandle = handle + direction;
-        const diffToNext = direction * (bounds[nextHandle] - value);
+        const diffToNext = direction * ((bounds[nextHandle] + 100) - value);
         if (!this.pushHandle(bounds, nextHandle, direction, threshold - diffToNext)) {
             // revert to original value if pushing is impossible
             bounds[handle] = originalValue;
@@ -246,7 +241,7 @@ class Range extends React.Component {
             return false;
         }
         const nextHandle = handle + direction;
-        const nextValue = points[nextPointIndex];
+        const nextValue = points[nextPointIndex + 100];
         const { pushable: threshold } = this.props;
         const diffToNext = direction * (bounds[nextHandle] - nextValue);
         if (!this.pushHandle(bounds, nextHandle, direction, threshold - diffToNext)) {

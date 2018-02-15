@@ -14,16 +14,15 @@ class VideoComponent extends Component {
         volume: 0.8,
         muted: false,
         played: 0,
-        playSeek: 0,
-        prevSeek: [0, 1, 100],
+        prevSeek: [0, 0, 100],
         loaded: 0,
         duration: 0,
-        playbackRate: 1.0,
-        zoomLevel: 0
+        playbackRate: 1.0
     };
 
     constructor(props) {
         super(props);
+        this.onSeekMouseDown = this.onSeekMouseDown.bind(this);
         this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
         this.startLoop = this.startLoop.bind(this);
     }
@@ -34,25 +33,24 @@ class VideoComponent extends Component {
     onPause = () => {
         this.setState({ playing: false });
     };
-    startLoop = (loopStart) => {
-        this.setState({ played: loopStart });
-    }
     onSeekMouseDown = () => {
+        this.onPause();
         // Start seeking, update how long we have played
         const playedAsSeek = this.state.played * 1000 * this.state.duration;
 
-        const prevSeek = [
+        const updatedPrevSeek = [
             this.state.prevSeek[0],
             playedAsSeek,
             this.state.prevSeek[2]
         ];
-        this.setState({ seeking: true, playing: false, prevSeek });
+        this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
     onSeekChange = (e) => {
         const seekStart = e[0];
         const playSeek = e[1];
         const seekEnd = e[2];
 
+        const playedAsSeek = this.state.played * 1000 * this.state.duration;
         const prevSeek = this.state.prevSeek;
 
         const prevSeekStart = prevSeek[0];
@@ -60,35 +58,30 @@ class VideoComponent extends Component {
         const prevSeekEnd = prevSeek[2];
 
         let seekTo = 0;
-        let updatedPrevSeek = [];
+        const updatedPrevSeek = [
+            prevSeekStart,
+            prevSeekPlay,
+            prevSeekEnd
+        ];
+
         if (seekStart !== prevSeekStart) {
             const timeFraction = parseFloat(seekStart);
             seekTo = timeFraction / (this.state.duration * 1000);
-            updatedPrevSeek = [
-                seekStart,
-                prevSeekPlay,
-                prevSeekEnd
-            ];
+            updatedPrevSeek[1] = playedAsSeek;
+            updatedPrevSeek[0] = seekStart;
         } else if (seekEnd !== prevSeekEnd) {
             const timeFraction = parseFloat(seekEnd);
             seekTo = timeFraction / (this.state.duration * 1000);
-            updatedPrevSeek = [
-                prevSeekStart,
-                prevSeekPlay,
-                seekEnd
-            ];
-        } else {
+            updatedPrevSeek[1] = playedAsSeek;
+            updatedPrevSeek[2] = seekEnd;
+        } else if (playSeek !== prevSeekPlay) {
             const timeFraction = parseFloat(playSeek);
             seekTo = timeFraction / (this.state.duration * 1000);
-            updatedPrevSeek = [
-                prevSeekStart,
-                playSeek,
-                prevSeekEnd
-            ];
+            updatedPrevSeek[1] = playSeek;
             this.setState({ played: seekTo });
         }
         this.player.seekTo(seekTo);
-        this.setState({ seeking: true, prevSeek: updatedPrevSeek, playing: false });
+        this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
     onSeekMouseUp = () => {
         const prevSeek = this.state.prevSeek;
@@ -105,6 +98,9 @@ class VideoComponent extends Component {
 
     setPlaybackRate = (e) => {
         this.setState({ playbackRate: parseFloat(e.target.value) });
+    };
+    startLoop = (loopStart) => {
+        this.setState({ played: loopStart });
     };
     playPause = () => {
         if (this.state.playing) {
@@ -135,7 +131,7 @@ class VideoComponent extends Component {
             url,
             played: 0,
             loaded: 0,
-            prevSeek: [0, 0, this.player.duration]
+            prevSeek: [0, 0, this.state.duration]
         });
     };
     onProgress = (state) => {

@@ -330,11 +330,14 @@
 }
 
 .handle-1 {
-  margin-left: 0;
   z-index: 3;
+  margin-left: 0;
   .handle-value {
     top: -37px;
     margin-left: 0;
+  }
+  .rc-slider-handle {
+    margin-left: -10px;
   }
 }
 
