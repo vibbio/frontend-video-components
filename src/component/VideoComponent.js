@@ -237,9 +237,9 @@ class VideoComponent extends Component {
 
                 <button
                     onClick={() => timeMarkerButtonFunction(prevSeek)}
-                    className="time-marker-modal-content-button"
+                    className="button primary-button time-marker-modal-content-button"
                 >
-                    Apply section
+                    Apply selection
                 </button>
             </div>
         );
