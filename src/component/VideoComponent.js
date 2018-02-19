@@ -118,7 +118,9 @@ class VideoComponent extends Component {
                 prevSeek: [prevSeekStart, prevSeekStart + 100, prevSeekEnd],
                 played: startTime + 1
             });
-            this.player.seekTo(startTime);
+            if (startTime > 0) {
+                this.player.seekTo(startTime);
+            }
             this.setState({ seeking: false });
         }
     };
