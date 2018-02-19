@@ -31,13 +31,21 @@ class Range extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
+        const { bounds } = this.state;
+        if ((nextProps.prevSeek[0] !== bounds[0]) ||
+            (nextProps.prevSeek[1] !== bounds[1]) ||
+            (nextProps.prevSeek[2] !== bounds[2])
+        ) {
+            this.setState({ bounds: nextProps.prevSeek });
+        }
         if (!('value' in nextProps || 'min' in nextProps || 'max' in nextProps)) return;
         if (this.props.min === nextProps.min &&
             this.props.max === nextProps.max &&
             shallowEqual(this.props.value, nextProps.value)) {
             return;
         }
-        const { bounds } = this.state;
+
+
         const value = nextProps.value || bounds;
         const nextBounds = value.map(v => this.trimAlignValue(v, nextProps));
         if (nextBounds.length === bounds.length && nextBounds.every((v, i) => v === bounds[i])) return;
@@ -404,7 +412,7 @@ Range.propTypes = {
 Range.defaultProps = {
     count: 1,
     allowCross: true,
-    pushable: false
+    pushable: false,
 };
 
 export default createSlider(Range);
