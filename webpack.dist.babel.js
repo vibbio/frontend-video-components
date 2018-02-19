@@ -1,10 +1,13 @@
 import path from 'path';
+import { extract } from 'extract-text-webpack-plugin';
 import config, { minifyPlugins } from './webpack.demo.babel';
-import {extract} from "extract-text-webpack-plugin";
 
 export default {
     ...config,
-    entry: './src/component/VideoComponent',
+    entry: [
+        path.join(__dirname, 'src/component/index.js'),
+        path.join(__dirname, 'src/component/styling/index.scss')
+    ],
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'VideoComponent.js',

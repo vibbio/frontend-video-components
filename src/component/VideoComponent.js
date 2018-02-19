@@ -4,7 +4,7 @@ import screenfull from 'screenfull';
 
 import Range from './range/Range';
 import ReactPlayer from './player/ReactPlayer';
-import './styling/VideoComponent.scss';
+import './styling/index.scss';
 
 class VideoComponent extends Component {
     constructor(props) {
