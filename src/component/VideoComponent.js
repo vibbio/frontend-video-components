@@ -23,7 +23,8 @@ class VideoComponent extends Component {
         prevSeek: [0, 0, 100],
         loaded: 0,
         duration: 0,
-        playbackRate: 1.0
+        playbackRate: 1.0,
+        ready: false
     };
     componentDidMount() {
         this.load(this.props.url, this.props.startTime, this.props.endTime);
@@ -46,7 +47,7 @@ class VideoComponent extends Component {
         ];
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
-    onSeekChange = (e) => {
+    onSeekChange = (e, handle) => {
         const seekStart = e[0];
         const playSeek = e[1];
         const seekEnd = e[2];
@@ -65,17 +66,18 @@ class VideoComponent extends Component {
             prevSeekEnd
         ];
 
-        if (seekStart !== prevSeekStart) {
+        // const alreadyPlayed = parseFloat(prev)
+        if (seekStart !== prevSeekStart && handle === 0) {
             const timeFraction = parseFloat(seekStart);
             seekTo = timeFraction / (this.state.duration * 1000);
             updatedPrevSeek[1] = playedAsSeek;
             updatedPrevSeek[0] = seekStart;
-        } else if (seekEnd !== prevSeekEnd) {
+        } else if (seekEnd !== prevSeekEnd && handle === 2) {
             const timeFraction = parseFloat(seekEnd);
             seekTo = timeFraction / (this.state.duration * 1000);
             updatedPrevSeek[1] = playedAsSeek;
             updatedPrevSeek[2] = seekEnd;
-        } else if (playSeek !== prevSeekPlay) {
+        } else if (playSeek !== prevSeekPlay && handle === 1) {
             const timeFraction = parseFloat(playSeek);
             seekTo = timeFraction / (this.state.duration * 1000);
             updatedPrevSeek[1] = playSeek;
@@ -103,6 +105,23 @@ class VideoComponent extends Component {
     startLoop = (loopStart) => {
         this.setState({ played: loopStart });
     };
+    isReady = (duration) => {
+        if (!this.state.ready) {
+            this.setState({ seeking: true });
+            const { startTime, endTime } = this.props;
+            const prevSeekStart = startTime ? Math.floor(startTime * 1000) : 0;
+            const prevSeekEnd = endTime ? Math.floor(endTime * 1000) : duration * 1000;
+
+            this.setState({
+                ready: true,
+                duration,
+                prevSeek: [prevSeekStart, prevSeekStart + 100, prevSeekEnd],
+                played: startTime + 1
+            });
+            this.player.seekTo(startTime);
+            this.setState({ seeking: false });
+        }
+    };
     playPause = () => {
         if (this.state.playing) {
             const playedAsSeek = this.state.played * 1000 * this.state.duration;
@@ -127,15 +146,10 @@ class VideoComponent extends Component {
     toggleMuted = () => {
         this.setState({ muted: !this.state.muted });
     };
-    load = (url, startTime, endTime) => {
-        const prevSeekStart = startTime ? Math.floor(startTime * 1000) : 0;
-        const prevSeekEnd = endTime ? Math.floor(endTime * 1000) : this.state.duration;
-
+    load = (url) => {
         this.setState({
             url,
-            played: 0,
-            loaded: 0,
-            prevSeek: [prevSeekStart, prevSeekStart + 10, prevSeekEnd]
+            loaded: 0
         });
     };
     onProgress = (state) => {
@@ -164,7 +178,7 @@ class VideoComponent extends Component {
     render() {
         const { timeMarkerButtonFunction } = this.props;
         const {
-            url, playing, volume, muted, prevSeek, duration, playbackRate, played, fileConfig
+            url, playing, volume, muted, prevSeek, duration, playbackRate, played, fileConfig, ready
         } = this.state;
 
         const maxValue = Math.floor(duration ? duration * 1000 : 10000);
@@ -184,6 +198,7 @@ class VideoComponent extends Component {
                         seeking={this.state.seeking}
                         prevSeek={prevSeek}
                         fileConfig={fileConfig}
+                        isReady={this.isReady}
                         startLoop={this.startLoop}
                         onPlay={this.onPlay}
                         onPause={this.onPause}
@@ -200,13 +215,12 @@ class VideoComponent extends Component {
                     </div>
                 </div>
                 <div className="slider-wrapper">
-                    {duration && (
+                    {ready ? (
                         <Range
                             min={0}
                             max={maxValue}
                             count={2}
                             defaultValue={[prevSeek[0], prevSeek[1] + 100, prevSeek[2]]}
-                            pushable
                             playedHandleValue={played ? played * maxValue : prevSeek[1]}
                             allowCross={false}
                             trackStyle={[{ backgroundColor: '#00576F' }, { backgroundColor: '#00849c' }]}
@@ -232,11 +246,11 @@ class VideoComponent extends Component {
                             prevSeek={prevSeek}
                             playing={playing}
                         />
-                    )}
+                    ) : <noscript />}
                 </div>
 
                 <button
-                    onClick={() => timeMarkerButtonFunction(prevSeek)}
+                    onClick={() => timeMarkerButtonFunction(prevSeek, duration)}
                     className="button primary-button time-marker-modal-content-button"
                 >
                     Apply selection

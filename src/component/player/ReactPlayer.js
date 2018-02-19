@@ -22,6 +22,10 @@ export default class ReactPlayer extends Component {
     };
     config = getConfig(this.props, defaultProps, true);
 
+    constructor(props) {
+        super(props);
+        this.isReady = this.isReady.bind(this);
+    }
     componentDidMount() {
         this.progress();
     }
@@ -86,6 +90,11 @@ export default class ReactPlayer extends Component {
         this.progressTimeout = setTimeout(this.progress, this.props.progressFrequency);
     };
 
+    isReady = () => {
+        const duration = this.player.getDuration();
+        this.props.isReady(duration);
+    };
+
     getActivePlayer(url) {
         for (const Player of players) {
             if (Player.canPlay(url)) {
@@ -109,6 +118,7 @@ export default class ReactPlayer extends Component {
         return (
             <Player
                 {...this.props}
+                isReady={this.isReady}
                 key={activePlayer.displayName}
                 ref={this.activePlayerRef}
                 config={this.config}

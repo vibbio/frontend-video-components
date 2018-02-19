@@ -15,7 +15,7 @@ class App extends Component {
                     <VideoComponent
                         url={'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4'}
                         startTime={23.2323}
-                        endTime={46.343434}
+                        endTime={undefined}
                         timeMarkerButtonFunction={func}
                     />
                 </section>

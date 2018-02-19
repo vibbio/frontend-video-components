@@ -114,6 +114,7 @@ export default class Player extends Component {
       const { onReady, playing } = this.props;
       this.isReady = true;
       this.loadingSDK = false;
+      this.props.isReady();
       onReady();
       if (playing) {
           if (this.loadOnReady) {

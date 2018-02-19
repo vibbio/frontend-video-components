@@ -59,7 +59,7 @@ class Range extends React.Component {
 
         const data = { ...this.state, ...state };
         const changedValue = data.bounds;
-        props.onChange(changedValue);
+        props.onChange(changedValue, state.handle);
     }
 
     onStart(position) {
