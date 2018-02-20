@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import classnames from 'classnames';
 import { findDOMNode } from 'react-dom';
 import screenfull from 'screenfull';
 
@@ -207,14 +208,16 @@ class VideoComponent extends Component {
                         onProgress={this.onProgress}
                         onDuration={newDuration => this.setState({ duration: newDuration })}
                     />
-                    <div className="play-button-wrapper">
-                        <button onClick={this.playPause} className="time-marker-button">
-                            {playing ?
-                                <i className="material-icons">pause</i> :
-                                <i className="material-icons">play_arrow</i>
-                            }
-                        </button>
-                    </div>
+                    <button className="play-button-wrapper" onClick={this.playPause}>
+                        <div className="time-marker-button-wrapper">
+                            <div className={classnames('time-marker-button', { 'pause-button': playing })}>
+                                {playing ?
+                                    <i className="material-icons">pause</i> :
+                                    <i className="material-icons">play_arrow</i>
+                                }
+                            </div>
+                        </div>
+                    </button>
                 </div>
                 <div className="slider-wrapper">
                     {ready ? (

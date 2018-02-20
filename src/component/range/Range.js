@@ -388,6 +388,7 @@ class Range extends React.Component {
                     offset={rightOffset}
                     length={leftOffset - rightOffset}
                     style={trackStyle[index]}
+                    index={i}
                     key={i}
                 />
             );

@@ -1,6 +1,12 @@
 .slider-wrapper {
   width: 80%;
   margin: auto;
+
+  &:hover, &:focus, &:active {
+    .handle-1 {
+      display: block;
+    }
+  }
 }
 
 .rc-slider {
@@ -8,7 +14,7 @@
   height: 14px;
   padding: 5px 0;
   width: 100%;
-  border-radius: 6px;
+  border-radius: 3px;
   -ms-touch-action: none;
   touch-action: none;
   box-sizing: border-box;
@@ -20,21 +26,20 @@
 }
 .rc-slider-rail {
   position: absolute;
-  width: 100%;
+  width: 104%;
   background-color: #a8e5e8;
   height: 10px;
-  border-radius: 6px;
+  border-radius: 3px;
 }
 .rc-slider-track {
   position: absolute;
   left: 0;
   height: 10px;
-  border-radius: 6px;
+  border-radius: 3px;
   background-color: #abe2fb;
 }
 .rc-slider-handle {
   position: absolute;
-  margin-left: -7px;
   margin-top: -5px;
   width: 14px;
   height: 14px;
@@ -287,7 +292,7 @@
   text-align: center;
   text-decoration: none;
   background-color: #6c6c6c;
-  border-radius: 6px;
+  border-radius: 3px;
   box-shadow: 0 0 4px #d9d9d9;
 }
 .rc-slider-tooltip-arrow {
@@ -307,9 +312,8 @@
 
 .handle-wrapper {
   position: relative;
-  margin-left: -7px;
+  z-index: 2;
 }
-
 
 .handle-value {
   background: rgba(38, 54, 69, 0.5);
@@ -325,15 +329,38 @@
   color: white;
 }
 
+.handle-0 {
+
+  .rc-slider-handle {
+    margin-left: -20px;
+  }
+}
+
 .handle-1 {
   z-index: 3;
+  display: none;
   margin-left: 0;
   .handle-value {
     top: -37px;
     margin-left: 0;
   }
   .rc-slider-handle {
-    margin-left: -10px;
+    margin-left: -5px;
   }
 }
+
+.handle-2 {
+  .rc-slider-handle {
+    margin-left: 10px;
+  }
+}
+
+.rc-slider-track-1 {
+  z-index: 1;
+}
+
+.rc-slider-track-2 {
+  border-radius: 0;
+}
+
 

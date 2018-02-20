@@ -10,12 +10,31 @@
 }
 
 .play-button-wrapper {
+  width: 100%;
+  height: 96%;
+  top: 0;
+  left: 0;
+  margin: 0;
+  border-radius: 0;
+  background: none;
+  position: absolute;
+
+  &:hover, &:focus {
+    background: none;
+  }
+}
+
+.time-marker-button-wrapper {
   left: 50%;
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   position: absolute;
+
+  .material-icons {
+    font-size: 38px;
+  }
 }
 
 
@@ -27,9 +46,14 @@
   border-radius: 40px;
   padding: 0;
   transition: all 300ms ease-in-out;
+  display: block;
 
   &:hover,
   &:focus {
     background-color: rgb(0, 132, 156)
+  }
+
+  &.pause-button {
+    display: none;
   }
 }
