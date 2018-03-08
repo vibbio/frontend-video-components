@@ -5,7 +5,7 @@ Time marker
 
 The component is exported from VideoComponent. 
 
-*Props*
+**Props**
 
 Prop | Description
 ---- | -----------
@@ -15,7 +15,7 @@ Prop | Description
 `timeMarkerButtonFunction` | The callback function. Input to the function is [startTime, currentPlayTime, endTime] and length 
 
 
-##Run local
+## Run local
  
 ```
 npm i && npm start
@@ -59,7 +59,7 @@ It could be smart to add some state information to the VideoComponent when worki
 </table>
 ```
 
-##Build
+## Build
 
 Build publish, but make sure you have access to VIBBIO npm registry. 
 
