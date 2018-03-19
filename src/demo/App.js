@@ -17,7 +17,9 @@ class App extends Component {
                         startTime={23.2323}
                         endTime={undefined}
                         timeMarkerButtonFunction={func}
-                    />
+                    >
+                        <p>Add children components here</p>
+                    </VideoComponent>
                 </section>
             </div>
         );

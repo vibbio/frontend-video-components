@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PT from 'prop-types';
 import classnames from 'classnames';
 import { findDOMNode } from 'react-dom';
 import screenfull from 'screenfull';
@@ -179,7 +180,7 @@ class VideoComponent extends Component {
     };
 
     render() {
-        const { timeMarkerButtonFunction } = this.props;
+        const { timeMarkerButtonFunction, children } = this.props;
         const {
             url, playing, volume, muted, prevSeek, duration, playbackRate, played, fileConfig, ready
         } = this.state;
@@ -253,7 +254,7 @@ class VideoComponent extends Component {
                         />
                     ) : <noscript />}
                 </div>
-
+                {children}
                 <button
                     onClick={() => timeMarkerButtonFunction(prevSeek, duration)}
                     className="button primary-button time-marker-modal-content-button"
@@ -264,5 +265,10 @@ class VideoComponent extends Component {
         );
     }
 }
+
+VideoComponent.propTypes = {
+    timeMarkerButtonFunction: PT.func.isRequired,
+    children: PT.node.isRequired
+};
 
 export default VideoComponent;
