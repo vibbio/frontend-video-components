@@ -32,10 +32,7 @@ class Range extends React.Component {
 
     componentWillReceiveProps(nextProps) {
         const { bounds } = this.state;
-        if ((nextProps.prevSeek[0] !== bounds[0]) ||
-            (nextProps.prevSeek[1] !== bounds[1]) ||
-            (nextProps.prevSeek[2] !== bounds[2])
-        ) {
+        if ((nextProps.prevSeek[0] !== bounds[0]) || (nextProps.prevSeek[1] !== bounds[1])) {
             this.setState({ bounds: nextProps.prevSeek });
         }
         if (!('value' in nextProps || 'min' in nextProps || 'max' in nextProps)) return;
@@ -112,21 +109,21 @@ class Range extends React.Component {
 
     onMove(e, position) {
         utils.pauseEvent(e);
-        const props = this.props;
-        const state = this.state;
+        const { allowCross } = this.props;
+        const { handle, bounds } = this.state;
 
         const value = this.calcValueByPos(position);
-        const oldValue = state.bounds[state.handle];
+        const oldValue = bounds[handle];
         if (value === oldValue) return;
 
-        const nextBounds = [...state.bounds];
-        nextBounds[state.handle] = value;
-        let nextHandle = state.handle;
+        const nextBounds = [...this.state.bounds];
+        nextBounds[handle] = value;
+        let nextHandle = this.state.handle;
         const pushableOn = false; // props.pushable;
         if (pushableOn && (nextHandle === 0 || nextHandle === 2)) {
-            const originalValue = state.bounds[nextHandle];
+            const originalValue = bounds[nextHandle];
             this.pushSurroundingHandles(nextBounds, nextHandle, originalValue);
-        } else if (props.allowCross) {
+        } else if (allowCross) {
             nextBounds.sort((a, b) => a - b);
             nextHandle = nextBounds.indexOf(value);
         }
@@ -298,29 +295,15 @@ class Range extends React.Component {
             max,
             handle: handleGenerator,
             trackStyle,
-            handleStyle,
-            playedHandleValue
+            handleStyle
         } = this.props;
 
         const offsets = bounds.map(v => this.calcOffset(v));
 
         const handleClassName = `${prefixCls}-handle`;
         const handles = bounds.map((v, i) => {
-            const isPlayMarkerHandle = i === 1;
             const dragging = (handle !== null) && (handle === i);
-
-            const { prevSeek } = this.props;
-            let offset;
-
-            if (isPlayMarkerHandle) {
-                if (!dragging && handle === null) {
-                    offset = this.calcOffset(playedHandleValue);
-                } else {
-                    offset = this.calcOffset(prevSeek[1]);
-                }
-            } else {
-                offset = offsets[i];
-            }
+            const offset = offsets[i];
 
             return handleGenerator({
                 className: classNames({
@@ -340,42 +323,23 @@ class Range extends React.Component {
             });
         });
 
-        const tracks = bounds.slice(0, -1).map((v, index) => {
+        const tracks = bounds.map((v, index) => {
             const isLeftPart = index === 0;
             const isRightPart = index === 1;
-            const dragging = (handle !== null) && (handle === index);
+            const i = index + 1;
 
-
-            const { prevSeek, playing } = this.props;
+            const playedOffset = this.calcOffset(this.props.played);
             let leftOffset;
             let rightOffset;
 
-
             if (isLeftPart) {
-                if (playing) {
-                    rightOffset = offsets[index];
-                    leftOffset = this.calcOffset(playedHandleValue);
-                } else if (!dragging) {
-                    rightOffset = offsets[index];
-                    leftOffset = this.calcOffset(prevSeek[1]);
-                } else {
-                    rightOffset = offsets[index];
-                    leftOffset = this.calcOffset(playedHandleValue);
-                }
+                leftOffset = offsets[i - 1];
+                rightOffset = playedOffset;
             } else if (isRightPart) {
-                if (playing) {
-                    leftOffset = offsets[index + 1];
-                    rightOffset = this.calcOffset(playedHandleValue);
-                } else if (!dragging) {
-                    rightOffset = this.calcOffset(prevSeek[1]);
-                    leftOffset = offsets[index + 1];
-                } else {
-                    leftOffset = offsets[index + 1];
-                    rightOffset = this.calcOffset(playedHandleValue);
-                }
+                rightOffset = offsets[i - 1];
+                leftOffset = playedOffset;
             }
 
-            const i = index + 1;
             const trackClassName = classNames({
                 [`${prefixCls}-track`]: true,
                 [`${prefixCls}-track-${i}`]: true
@@ -385,8 +349,8 @@ class Range extends React.Component {
                     className={trackClassName}
                     vertical={vertical}
                     included={included}
-                    offset={rightOffset}
-                    length={leftOffset - rightOffset}
+                    offset={leftOffset}
+                    length={rightOffset - leftOffset}
                     style={trackStyle[index]}
                     index={i}
                     key={i}
@@ -413,7 +377,7 @@ Range.propTypes = {
 Range.defaultProps = {
     count: 1,
     allowCross: true,
-    pushable: false,
+    pushable: false
 };
 
 export default createSlider(Range);

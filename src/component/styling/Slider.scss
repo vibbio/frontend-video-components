@@ -336,19 +336,6 @@
   }
 }
 
-.handle-1 {
-  z-index: 3;
-  display: none;
-  margin-left: 0;
-  .handle-value {
-    top: -37px;
-    margin-left: 0;
-  }
-  .rc-slider-handle {
-    margin-left: -5px;
-  }
-}
-
 .handle-2 {
   .rc-slider-handle {
     margin-left: 10px;
@@ -356,11 +343,9 @@
 }
 
 .rc-slider-track-1 {
-  z-index: 1;
+  z-index: 2;
 }
 
 .rc-slider-track-2 {
   border-radius: 0;
 }
-
-

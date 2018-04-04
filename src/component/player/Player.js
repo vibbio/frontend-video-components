@@ -67,8 +67,8 @@ export default class Player extends Component {
       const currentTime = this.player.getCurrentTime();
 
       let newEnd = this.getDuration();
-      if (this.props.prevSeek && this.props.prevSeek[2]) {
-          newEnd = this.props.prevSeek[2] / 1000.0;
+      if (this.props.prevSeek && this.props.prevSeek[1]) {
+          newEnd = this.props.prevSeek[1] / 1000.0;
       }
       if ((currentTime) > newEnd) {
           const timeFraction = parseFloat(this.props.prevSeek[0]);

@@ -13,8 +13,8 @@ class App extends Component {
             <div className="app">
                 <section className="section">
                     <VideoComponent
-                        url={'http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4'}
-                        startTime={23.2323}
+                        url="https://storage.googleapis.com/vibbio-storage/COMPRESSED/handelshoyskbi/2017-11-28/MVI_3556.MOV?GoogleAccessId=122546337893-compute@developer.gserviceaccount.com&Expires=1522831379&Signature=Ronzcgwg1B9v9t0Q5pf4PH8bngeRE5G1DqG%2Bt7QAgL9LDsrCN8KcjrwJAe7aG%2BwuNpuRQozAgyBgivl09bdKWLW9S%2FtlxUYgCiYMxOi6OWdGXl2K%2Be5LiL6XwUxNN52yYZRrN4KY6WsCbsn6nzXgBmbE1ddtcH8yFlTrmKhc4cV527X0EukiHgfE3hzy0hNVo1%2BKL8grUBWHva%2FEWGRQodXT%2FlsvHx2VvY73JN64Tr5oq9PT52SIRLp1wQZW85Gaxp%2Bm6K56E2ye%2BenG59mlNWSXy%2FpeSyedBPDOYXr9iQxeKBaPgAzfHozliw0DuzbWtnVqONOnw17RNyuzMwvkVA%3D%3D"
+                        // startTime={23.2323}
                         endTime={undefined}
                         timeMarkerButtonFunction={func}
                     >

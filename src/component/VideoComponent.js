@@ -22,7 +22,7 @@ class VideoComponent extends Component {
         volume: 0.8,
         muted: false,
         played: 0,
-        prevSeek: [0, 0, 100],
+        prevSeek: [0, 100],
         loaded: 0,
         duration: 0,
         playbackRate: 1.0,
@@ -39,62 +39,45 @@ class VideoComponent extends Component {
     };
     onSeekMouseDown = () => {
         this.onPause();
-        // Start seeking, update how long we have played
-        const playedAsSeek = this.state.played * 1000 * this.state.duration;
-
         const updatedPrevSeek = [
             this.state.prevSeek[0],
-            playedAsSeek,
-            this.state.prevSeek[2]
+            this.state.prevSeek[1]
         ];
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
     onSeekChange = (e, handle) => {
         const seekStart = e[0];
-        const playSeek = e[1];
-        const seekEnd = e[2];
+        const seekEnd = e[1];
 
-        const playedAsSeek = this.state.played * 1000 * this.state.duration;
-        const prevSeek = this.state.prevSeek;
-
+        const { prevSeek } = this.state;
         const prevSeekStart = prevSeek[0];
-        const prevSeekPlay = prevSeek[1];
-        const prevSeekEnd = prevSeek[2];
+        const prevSeekEnd = prevSeek[1];
 
         let seekTo = 0;
         const updatedPrevSeek = [
             prevSeekStart,
-            prevSeekPlay,
             prevSeekEnd
         ];
 
-        // const alreadyPlayed = parseFloat(prev)
         if (seekStart !== prevSeekStart && handle === 0) {
             const timeFraction = parseFloat(seekStart);
             seekTo = timeFraction / (this.state.duration * 1000);
-            updatedPrevSeek[1] = playedAsSeek;
             updatedPrevSeek[0] = seekStart;
-        } else if (seekEnd !== prevSeekEnd && handle === 2) {
+        } else if (seekEnd !== prevSeekEnd && handle === 1) {
             const timeFraction = parseFloat(seekEnd);
             seekTo = timeFraction / (this.state.duration * 1000);
-            updatedPrevSeek[1] = playedAsSeek;
-            updatedPrevSeek[2] = seekEnd;
-        } else if (playSeek !== prevSeekPlay && handle === 1) {
-            const timeFraction = parseFloat(playSeek);
-            seekTo = timeFraction / (this.state.duration * 1000);
-            updatedPrevSeek[1] = playSeek;
-            this.setState({ played: seekTo });
+            updatedPrevSeek[1] = seekEnd;
         }
         this.player.seekTo(seekTo);
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
     onSeekMouseUp = () => {
         const prevSeek = this.state.prevSeek;
-        const prevSeekPlay = prevSeek[1];
+        const prevSeekPlay = prevSeek[0];
         const timeFraction = parseFloat(prevSeekPlay);
         const seekTo = timeFraction / (this.state.duration * 1000);
         this.player.seekTo(seekTo);
-        this.setState({ seeking: false, playing: false });
+        this.setState({ seeking: false, playing: false, played: seekTo });
     };
 
     setVolume = (e) => {
@@ -114,11 +97,13 @@ class VideoComponent extends Component {
             const prevSeekStart = startTime ? Math.floor(startTime * 1000) : 0;
             const prevSeekEnd = endTime ? Math.floor(endTime * 1000) : duration * 1000;
 
+            const initialPlayed = startTime / (this.state.duration * 1000);
+
             this.setState({
                 ready: true,
                 duration,
-                prevSeek: [prevSeekStart, prevSeekStart + 100, prevSeekEnd],
-                played: startTime + 1
+                prevSeek: [prevSeekStart, prevSeekEnd],
+                played: initialPlayed // startTime + 1
             });
             if (startTime > 0) {
                 this.player.seekTo(startTime);
@@ -128,17 +113,14 @@ class VideoComponent extends Component {
     };
     playPause = () => {
         if (this.state.playing) {
-            const playedAsSeek = this.state.played * 1000 * this.state.duration;
-
             const prevSeek = [
                 this.state.prevSeek[0],
-                playedAsSeek,
-                this.state.prevSeek[2]
+                this.state.prevSeek[1]
             ];
             this.setState({ playing: false, prevSeek });
             return;
         }
-        const playSeekMarker = this.state.prevSeek[1];
+        const playSeekMarker = this.state.prevSeek[0];
         const timeFraction = parseFloat(playSeekMarker);
         const seekTo = timeFraction / (this.state.duration * 1000);
         this.player.seekTo(seekTo);
@@ -182,7 +164,7 @@ class VideoComponent extends Component {
     render() {
         const { timeMarkerButtonFunction, children } = this.props;
         const {
-            url, playing, volume, muted, prevSeek, duration, playbackRate, played, fileConfig, ready
+            url, playing, volume, muted, prevSeek, duration, playbackRate, played, loaded, fileConfig, ready
         } = this.state;
 
         const maxValue = Math.floor(duration ? duration * 1000 : 10000);
@@ -219,25 +201,21 @@ class VideoComponent extends Component {
                             </div>
                         </div>
                     </button>
+                    <div className={classnames('is-loading', { loading: loaded < 0.2 })} />
                 </div>
                 <div className="slider-wrapper">
                     {ready ? (
                         <Range
                             min={0}
                             max={maxValue}
-                            count={2}
-                            defaultValue={[prevSeek[0], prevSeek[1] + 100, prevSeek[2]]}
-                            playedHandleValue={played ? played * maxValue : prevSeek[1]}
-                            allowCross={false}
+                            defaultValue={[prevSeek[0], prevSeek[1]]}
+                            allowCross
                             trackStyle={[{ backgroundColor: '#00576F' }, { backgroundColor: '#00849c' }]}
                             handleStyle={[
                                 {
                                     height: '20px',
                                     width: '20px',
                                     borderRadius: '20px'
-                                },
-                                {
-                                    marginTop: '-2px'
                                 },
                                 {
                                     height: '20px',
@@ -249,8 +227,9 @@ class VideoComponent extends Component {
                             onMouseDown={this.onSeekMouseDown}
                             onChange={this.onSeekChange}
                             onMouseUp={this.onSeekMouseUp}
-                            prevSeek={prevSeek}
+                            prevSeek={[prevSeek[0], prevSeek[1]]}
                             playing={playing}
+                            played={played * duration * 1000}
                         />
                     ) : <noscript />}
                 </div>
@@ -268,7 +247,10 @@ class VideoComponent extends Component {
 
 VideoComponent.propTypes = {
     timeMarkerButtonFunction: PT.func.isRequired,
-    children: PT.node.isRequired
+    children: PT.node.isRequired,
+    url: PT.string.isRequired,
+    startTime: PT.number,
+    endTime: PT.number
 };
 
 export default VideoComponent;
