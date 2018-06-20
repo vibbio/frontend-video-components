@@ -4,8 +4,8 @@ import PT from 'prop-types';
 const Track = (props) => {
     const { className, included, vertical, offset, length, style, index } = props;
 
-    const leftPosition = index === 1 ? offset - 1 : offset;
-    const trackLength = index === 1 ? length + 2 : length + 3;
+    const leftPosition = index === 1 ? offset : offset;
+    const trackLength = length + 1;
 
     const positionStyle = vertical ? {
         bottom: `${offset}%`,

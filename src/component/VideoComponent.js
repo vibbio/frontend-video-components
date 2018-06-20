@@ -26,7 +26,8 @@ class VideoComponent extends Component {
         loaded: 0,
         duration: 0,
         playbackRate: 1.0,
-        ready: false
+        ready: false,
+        playedWhenStopped: 0
     };
     componentDidMount() {
         this.load(this.props.url, this.props.startTime, this.props.endTime);
@@ -35,6 +36,9 @@ class VideoComponent extends Component {
         this.setState({ playing: true });
     };
     onPause = () => {
+        if (this.state.playing) {
+            this.setState({ playedWhenStopped: this.state.played });
+        }
         this.setState({ playing: false });
     };
     onSeekMouseDown = () => {
@@ -53,31 +57,39 @@ class VideoComponent extends Component {
         const prevSeekStart = prevSeek[0];
         const prevSeekEnd = prevSeek[1];
 
-        let seekTo = 0;
         const updatedPrevSeek = [
             prevSeekStart,
             prevSeekEnd
         ];
 
         if (seekStart !== prevSeekStart && handle === 0) {
-            const timeFraction = parseFloat(seekStart);
-            seekTo = timeFraction / (this.state.duration * 1000);
             updatedPrevSeek[0] = seekStart;
         } else if (seekEnd !== prevSeekEnd && handle === 1) {
-            const timeFraction = parseFloat(seekEnd);
-            seekTo = timeFraction / (this.state.duration * 1000);
             updatedPrevSeek[1] = seekEnd;
         }
-        this.player.seekTo(seekTo);
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
     onSeekMouseUp = () => {
-        const prevSeek = this.state.prevSeek;
-        const prevSeekPlay = prevSeek[0];
-        const timeFraction = parseFloat(prevSeekPlay);
-        const seekTo = timeFraction / (this.state.duration * 1000);
-        this.player.seekTo(seekTo);
-        this.setState({ seeking: false, playing: false, played: seekTo });
+        const { prevSeek, duration, played } = this.state;
+        const prevSeekStart = prevSeek[0];
+        const prevSeekEnd = prevSeek[1];
+        const timeFractionStart = parseFloat(prevSeekStart);
+        const seekToStart = timeFractionStart / (duration * 1000);
+
+        const timeFractionEnd = parseFloat(prevSeekEnd);
+        const seekToEnd = timeFractionEnd / (duration * 1000);
+
+        const startDiff = Math.abs(played - seekToStart);
+        const endDiff = Math.abs(played - seekToEnd);
+        if (endDiff > startDiff) {
+            this.player.seekTo(seekToEnd);
+            this.setState({ seeking: false, playing: false, played: seekToEnd });
+            return;
+        }
+
+        this.player.seekTo(seekToStart);
+        this.setState({ seeking: false, playing: false, played: seekToStart });
+
     };
 
     setVolume = (e) => {
@@ -162,9 +174,10 @@ class VideoComponent extends Component {
     };
 
     render() {
-        const { timeMarkerButtonFunction, children } = this.props;
+        const { imageUrl, timeMarkerButtonFunction, children } = this.props;
         const {
-            url, playing, volume, muted, prevSeek, duration, playbackRate, played, loaded, fileConfig, ready
+            url, playing, volume, muted, prevSeek, duration, playbackRate,
+            played, loaded, fileConfig, ready, playedWhenStopped
         } = this.state;
 
         const maxValue = Math.floor(duration ? duration * 1000 : 10000);
@@ -210,18 +223,9 @@ class VideoComponent extends Component {
                             max={maxValue}
                             defaultValue={[prevSeek[0], prevSeek[1]]}
                             allowCross
-                            trackStyle={[{ backgroundColor: '#00576F' }, { backgroundColor: '#00849c' }]}
                             handleStyle={[
-                                {
-                                    height: '20px',
-                                    width: '20px',
-                                    borderRadius: '20px'
-                                },
-                                {
-                                    height: '20px',
-                                    width: '20px',
-                                    borderRadius: '20px'
-                                }
+                                { height: '50px', width: '5px' },
+                                { height: '50px', width: '5px' }
                             ]}
                             railStyle={{ backgroundColor: '#a8e5e8' }}
                             onMouseDown={this.onSeekMouseDown}
@@ -232,6 +236,11 @@ class VideoComponent extends Component {
                             played={played * duration * 1000}
                         />
                     ) : <noscript />}
+                    <img src={imageUrl} role="presentation" className="image-strip" />
+                    <div
+                        className="played-marker"
+                        style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
+                    />
                 </div>
                 {children}
                 <button
@@ -248,6 +257,7 @@ class VideoComponent extends Component {
 VideoComponent.propTypes = {
     timeMarkerButtonFunction: PT.func.isRequired,
     children: PT.node.isRequired,
+    imageUrl: PT.string.isRequired,
     url: PT.string.isRequired,
     startTime: PT.number,
     endTime: PT.number
