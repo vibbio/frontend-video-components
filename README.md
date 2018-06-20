@@ -61,11 +61,15 @@ It could be smart to add some state information to the VideoComponent when worki
 
 ## Build
 
-Build publish, but make sure you have access to VIBBIO npm registry. 
+Build publish, but make sure you have access to VIBBIO npm registry.
+Update the version in package.json and delete `/styling` in `/lib`
 
 ```
 npm i
-npm version patch
+```
+Commit your new version. 
+
+```
 npm run build
 npm publish
 ```
