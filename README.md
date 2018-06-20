@@ -59,18 +59,34 @@ It could be smart to add some state information to the VideoComponent when worki
 </table>
 ```
 
-## Build
+## Build and publish
 
-Build publish, but make sure you have access to VIBBIO npm registry.
-Update the version in package.json and delete `/styling` in `/lib`
+Instructions to build and publish the package to VIBBIO npm registry.
+Instructions is also found [here](https://docs.google.com/document/d/1m3W3AljdX4-E4U9GkLwl9iUlWsJa0Kj1mxvEjWaQpAk/edit?usp=sharing).
+
+1. Make sure you have access to the npm registry: 
+```
+npm login -registry=https://registry.npmjs.org/ -scope=@vibbio
+```
+2. Add the log in details
+
+Username: vibbio
+
+Password: FollowTheNpm123
+
+Email: (this IS public) tech@vibbio.com
+
+
+3. Update the version in package.json and delete `/styling` in `/lib`
 
 ```
 npm i
 ```
-Commit your new version. 
 
+4. Commit your new version
+
+5. Publish your new version to npm
 ```
-npm run build
 npm publish
 ```
 
