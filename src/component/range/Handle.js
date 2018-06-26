@@ -14,10 +14,10 @@ class Handle extends Component {
 
     render() {
         const {
-            index, className, vertical, offset, style, disabled, dragging, min, max, value, ...restProps
+            index, className, offset, style, disabled, min, max, value, ...restProps
         } = this.props;
 
-        const positionStyle = vertical ? { bottom: `${offset}%` } : { left: `${offset}%` };
+        const positionStyle = { left: `${offset}%` };
         const elStyle = {
             ...style
         };
@@ -43,11 +43,9 @@ class Handle extends Component {
                     className={className}
                     style={elStyle}
                 />
-                {((index !== 1) || dragging) && (
-                    <div className="handle-value">
-                        <span>{prettyPrintTimeStamp(value)}</span>
-                    </div>
-                )}
+                <div className="handle-value">
+                    <span>{prettyPrintTimeStamp(value)}</span>
+                </div>
             </div>
         );
     }
@@ -56,7 +54,6 @@ class Handle extends Component {
 Handle.propTypes = {
     index: PropTypes.number,
     className: PropTypes.string,
-    vertical: PropTypes.bool,
     dragging: PropTypes.bool,
     offset: PropTypes.number,
     style: PropTypes.object,

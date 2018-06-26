@@ -288,7 +288,6 @@ class Range extends React.Component {
         } = this.state;
         const {
             prefixCls,
-            vertical,
             included,
             disabled,
             min,
@@ -310,7 +309,6 @@ class Range extends React.Component {
                     [handleClassName]: true,
                     [`${handleClassName}-${i + 1}`]: true
                 }),
-                vertical,
                 offset,
                 value: v,
                 dragging,
@@ -347,7 +345,6 @@ class Range extends React.Component {
             return (
                 <Track
                     className={trackClassName}
-                    vertical={vertical}
                     included={included}
                     offset={leftOffset}
                     length={rightOffset - leftOffset}

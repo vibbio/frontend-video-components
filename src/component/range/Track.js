@@ -2,17 +2,11 @@ import React from 'react';
 import PT from 'prop-types';
 
 const Track = (props) => {
-    const { className, included, vertical, offset, length, style, index } = props;
+    const { className, included, offset, length, style } = props;
 
-    const leftPosition = index === 1 ? offset : offset;
-    const trackLength = length + 1;
-
-    const positionStyle = vertical ? {
-        bottom: `${offset}%`,
-        height: `${length}%`
-    } : {
-        left: `${leftPosition}%`,
-        width: `${trackLength}%`
+    const positionStyle = {
+        left: `${offset}%`,
+        width: `${length}%`
     };
 
     const elStyle = {
@@ -28,9 +22,7 @@ Track.propTypes = {
     offset: PT.number,
     length: PT.number,
     style: PT.object,
-    included: PT.bool,
-    vertical: PT.bool,
-    index: PT.number
+    included: PT.bool
 };
 
 export default Track;

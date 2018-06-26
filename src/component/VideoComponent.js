@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { findDOMNode } from 'react-dom';
 import screenfull from 'screenfull';
 
-import Range from './range/Range';
+import Range from './range/Slider';
 import ReactPlayer from './player/ReactPlayer';
 import './styling/index.scss';
 
@@ -224,8 +224,8 @@ class VideoComponent extends Component {
                             defaultValue={[prevSeek[0], prevSeek[1]]}
                             allowCross
                             handleStyle={[
-                                { height: '50px', width: '5px' },
-                                { height: '50px', width: '5px' }
+                                { height: '80px', width: '5px' },
+                                { height: '80px', width: '5px' }
                             ]}
                             railStyle={{ backgroundColor: '#a8e5e8' }}
                             onMouseDown={this.onSeekMouseDown}
@@ -234,6 +234,10 @@ class VideoComponent extends Component {
                             prevSeek={[prevSeek[0], prevSeek[1]]}
                             playing={playing}
                             played={played * duration * 1000}
+                            // style={{
+                            //     background: `url(${imageUrl})`,
+                            //     backgroundSize: '100% 70px, cover'
+                            // }}
                         />
                     ) : <noscript />}
                     <img src={imageUrl} role="presentation" className="image-strip" />

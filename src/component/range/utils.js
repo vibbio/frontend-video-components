@@ -35,19 +35,17 @@ export function getPrecision(step) {
     return precision;
 }
 
-export function getMousePosition(vertical, e) {
-    return vertical ? e.clientY : e.pageX;
+export function getMousePosition(e) {
+    return e.pageX;
 }
 
-export function getTouchPosition(vertical, e) {
-    return vertical ? e.touches[0].clientY : e.touches[0].pageX;
+export function getTouchPosition(e) {
+    return e.touches[0].pageX;
 }
 
-export function getHandleCenterPosition(vertical, handle) {
+export function getHandleCenterPosition(handle) {
     const coords = handle.getBoundingClientRect();
-    return vertical ?
-        coords.top + (coords.height * 0.5) :
-        coords.left + (coords.width * 0.5);
+    return coords.left + (coords.width * 0.5);
 }
 
 export function ensureValueInRange(val, { max, min }) {

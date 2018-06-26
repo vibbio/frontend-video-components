@@ -1,62 +1,95 @@
-/* eslint-disable react/prop-types */
-import React from 'react';
-import PropTypes from 'prop-types';
-import warning from 'warning';
+import React, { cloneElement } from 'react';
+import addEventListener from 'rc-util/lib/Dom/addEventListener';
+import classNames from 'classnames';
 import Track from './Track';
-import createSlider from './CreateSlider';
-import * as utils from './utils';
+import DefaultHandle from './Handle';
+import Steps from './Steps';
+import Marks from './Marks';
+
+function noop() {
+}
+
+function isNotTouchEvent(e) {
+    return e.touches.length > 1 || (e.type.toLowerCase() === 'touchend' && e.touches.length > 0);
+}
+
+function getTouchPosition(vertical, e) {
+    return vertical ? e.touches[0].clientY : e.touches[0].pageX;
+}
+
+function getMousePosition(vertical, e) {
+    return vertical ? e.clientY : e.pageX;
+}
+
+function pauseEvent(e) {
+    e.stopPropagation();
+    e.preventDefault();
+}
 
 class Slider extends React.Component {
-    static propTypes = {
-        defaultValue: PropTypes.number,
-        value: PropTypes.number,
-        disabled: PropTypes.bool,
-        autoFocus: PropTypes.bool,
-    };
-
     constructor(props) {
         super(props);
 
-        const defaultValue = props.defaultValue !== undefined ?
-            props.defaultValue : props.min;
-        const value = props.value !== undefined ?
-            props.value : defaultValue;
+        const {range, min, max} = props;
+        const initialValue = range ? [min, min] : min;
+        const defaultValue = ('defaultValue' in props ? props.defaultValue : initialValue);
+        const value = (props.value !== undefined ? props.value : defaultValue);
+
+        let upperBound;
+        let lowerBound;
+        if (props.range) {
+            lowerBound = this.trimAlignValue(value[0]);
+            upperBound = this.trimAlignValue(value[1]);
+        } else {
+            upperBound = this.trimAlignValue(value);
+        }
+
+        let recent;
+        if (props.range && upperBound === lowerBound) {
+            recent = lowerBound === max ? 'lowerBound' : 'upperBound';
+        } else {
+            recent = 'upperBound';
+        }
 
         this.state = {
-            value: this.trimAlignValue(value),
-            dragging: false,
+            handle: null,
+            recent: recent,
+            upperBound: upperBound,
+            // If Slider is not range, set `lowerBound` equal to `min`.
+            lowerBound: (lowerBound || min),
         };
-        if (process.env.NODE_ENV !== 'production') {
-            warning(
-                !('minimumTrackStyle' in props),
-                'minimumTrackStyle will be deprecate, please use trackStyle instead.'
-            );
-            warning(
-                !('maximumTrackStyle' in props),
-                'maximumTrackStyle will be deprecate, please use railStyle instead.'
-            );
-        }
-    }
-
-    componentDidMount() {
-        const { autoFocus, disabled } = this.props;
-        if (autoFocus && !disabled) {
-            this.focus();
-        }
     }
 
     componentWillReceiveProps(nextProps) {
         if (!('value' in nextProps || 'min' in nextProps || 'max' in nextProps)) return;
 
-        const prevValue = this.state.value;
-        const value = nextProps.value !== undefined ?
-            nextProps.value : prevValue;
-        const nextValue = this.trimAlignValue(value, nextProps);
-        if (nextValue === prevValue) return;
+        const {lowerBound, upperBound} = this.state;
+        if (nextProps.range) {
+            const value = nextProps.value || [lowerBound, upperBound];
+            const nextUpperBound = this.trimAlignValue(value[1], nextProps);
+            const nextLowerBound = this.trimAlignValue(value[0], nextProps);
+            if (nextLowerBound === lowerBound && nextUpperBound === upperBound) return;
 
-        this.setState({ value: nextValue });
-        if (utils.isValueOutOfRange(value, nextProps)) {
-            this.props.onChange(nextValue);
+            this.setState({
+                upperBound: nextUpperBound,
+                lowerBound: nextLowerBound,
+            });
+            if (this.isValueOutOfBounds(upperBound, nextProps) ||
+                this.isValueOutOfBounds(lowerBound, nextProps)) {
+                this.props.onChange([nextLowerBound, nextUpperBound]);
+            }
+        } else {
+            const value = nextProps.value !== undefined ? nextProps.value : upperBound;
+            const nextValue = this.trimAlignValue(value, nextProps);
+            if (nextValue === upperBound && lowerBound === nextProps.min) return;
+
+            this.setState({
+                upperBound: nextValue,
+                lowerBound: nextProps.min,
+            });
+            if (this.isValueOutOfBounds(upperBound, nextProps)) {
+                this.props.onChange(nextValue);
+            }
         }
     }
 
@@ -65,121 +98,329 @@ class Slider extends React.Component {
         const isNotControlled = !('value' in props);
         if (isNotControlled) {
             this.setState(state);
+        } else if (state.handle) {
+            this.setState({handle: state.handle});
         }
 
-        const changedValue = state.value;
+        const data = {...this.state, ...state};
+        const changedValue = props.range ? [data.lowerBound, data.upperBound] : data.upperBound;
         props.onChange(changedValue);
     }
 
-    onStart(position) {
-        this.setState({ dragging: true });
+    onMouseMove(e) {
+        const position = getMousePosition(this.props.vertical, e);
+        this.onMove(e, position);
+    }
+
+    onTouchMove(e) {
+        if (isNotTouchEvent(e)) {
+            this.end('touch');
+            return;
+        }
+
+        const position = getTouchPosition(e);
+        this.onMove(e, position);
+    }
+
+    onMove(e, position) {
+        pauseEvent(e);
         const props = this.props;
-        const prevValue = this.getValue();
-        props.onBeforeChange(prevValue);
+        const state = this.state;
+
+        let diffPosition = position - this.startPosition;
+        diffPosition = diffPosition;
+        const diffValue = diffPosition / this.getSliderLength() * (props.max - props.min);
+
+        const value = this.trimAlignValue(this.startValue + diffValue);
+        const oldValue = state[state.handle];
+        if (value === oldValue) return;
+
+        if (props.allowCross && value < state.lowerBound && state.handle === 'upperBound') {
+            this.onChange({
+                handle: 'lowerBound',
+                lowerBound: value,
+                upperBound: this.state.lowerBound,
+            });
+            return;
+        }
+        if (props.allowCross && value > state.upperBound && state.handle === 'lowerBound') {
+            this.onChange({
+                handle: 'upperBound',
+                upperBound: value,
+                lowerBound: this.state.upperBound,
+            });
+            return;
+        }
+
+        this.onChange({
+            [state.handle]: value,
+        });
+    }
+
+    onTouchStart(e) {
+        if (isNotTouchEvent(e)) return;
+
+        const position = getTouchPosition(this.props.vertical, e);
+        this.onStart(position);
+        this.addDocumentEvents('touch');
+        pauseEvent(e);
+    }
+
+    onMouseDown(e) {
+        if (e.button !== 0) { return; }
+        const position = getMousePosition(this.props.vertical, e);
+        this.onStart(position);
+        this.addDocumentEvents('mouse');
+        pauseEvent(e);
+    }
+
+    onStart(position) {
+        const props = this.props;
+        props.onBeforeChange(this.getValue());
 
         const value = this.calcValueByPos(position);
         this.startValue = value;
         this.startPosition = position;
 
-        if (value === prevValue) return;
+        const state = this.state;
+        const {upperBound, lowerBound} = state;
 
-        this.onChange({ value });
-    }
+        let valueNeedChanging = 'upperBound';
+        if (this.props.range) {
+            const isLowerBoundCloser = Math.abs(upperBound - value) > Math.abs(lowerBound - value);
+            if (isLowerBoundCloser) {
+                valueNeedChanging = 'lowerBound';
+            }
 
-    onEnd = () => {
-        this.setState({ dragging: false });
-        this.removeDocumentEvents();
-        this.props.onAfterChange(this.getValue());
-    }
+            const isAtTheSamePoint = (upperBound === lowerBound);
+            if (isAtTheSamePoint) {
+                valueNeedChanging = state.recent;
+            }
 
-    onMove(e, position) {
-        utils.pauseEvent(e);
-        const { value: oldValue } = this.state;
-        const value = this.calcValueByPos(position);
+            if (isAtTheSamePoint && (value !== upperBound)) {
+                valueNeedChanging = value < upperBound ? 'lowerBound' : 'upperBound';
+            }
+        }
+
+        this.setState({
+            handle: valueNeedChanging,
+            recent: valueNeedChanging,
+        });
+
+        const oldValue = state[valueNeedChanging];
         if (value === oldValue) return;
 
-        this.onChange({ value });
-    }
-
-    onKeyboard(e) {
-        const valueMutator = utils.getKeyboardValueMutator(e);
-
-        if (valueMutator) {
-            utils.pauseEvent(e);
-            const state = this.state;
-            const oldValue = state.value;
-            const mutatedValue = valueMutator(oldValue, this.props);
-            const value = this.trimAlignValue(mutatedValue);
-            if (value === oldValue) return;
-
-            this.onChange({ value });
-        }
+        this.onChange({
+            [valueNeedChanging]: value,
+        });
     }
 
     getValue() {
-        return this.state.value;
+        const {lowerBound, upperBound} = this.state;
+        return this.props.range ? [lowerBound, upperBound] : upperBound;
     }
 
-    getLowerBound() {
-        return this.props.min;
+    getSliderLength() {
+        const slider = this.refs.slider;
+        if (!slider) {
+            return 0;
+        }
+
+        return this.props.vertical ? slider.clientHeight : slider.clientWidth;
     }
 
-    getUpperBound() {
-        return this.state.value;
+    getSliderStart() {
+        const slider = this.refs.slider;
+        const rect = slider.getBoundingClientRect();
+
+        return this.props.vertical ? rect.top : rect.left;
     }
 
-    trimAlignValue(v, nextProps = {}) {
-        const mergedProps = { ...this.props, ...nextProps };
-        const val = utils.ensureValueInRange(v, mergedProps);
-        return utils.ensureValuePrecision(val, mergedProps);
+    getPrecision(step) {
+        const stepString = step.toString();
+        let precision = 0;
+        if (stepString.indexOf('.') >= 0) {
+            precision = stepString.length - stepString.indexOf('.') - 1;
+        }
+        return precision;
+    }
+
+    isValueOutOfBounds(value, props) {
+        return value < props.min || value > props.max;
+    }
+
+    trimAlignValue(v, nextProps) {
+        const state = this.state || {};
+        const {handle, lowerBound, upperBound} = state;
+        const {marks, step, min, max, allowCross} = {...this.props, ...(nextProps || {})};
+
+        let val = v;
+        if (val <= min) {
+            val = min;
+        }
+        if (val >= max) {
+            val = max;
+        }
+        if (!allowCross && handle === 'upperBound' && val <= lowerBound) {
+            val = lowerBound;
+        }
+        if (!allowCross && handle === 'lowerBound' && val >= upperBound) {
+            val = upperBound;
+        }
+
+        const points = Object.keys(marks).map(parseFloat);
+        if (step !== null) {
+            const closestStep = (Math.round((val - min) / step) * step) + min;
+            points.push(closestStep);
+        }
+
+        const diffs = points.map((point) => Math.abs(val - point));
+        const closestPoint = points[diffs.indexOf(Math.min.apply(Math, diffs))];
+
+        return step !== null ? parseFloat(closestPoint.toFixed(this.getPrecision(step))) : closestPoint;
+    }
+
+    calcOffset(value) {
+        const {min, max} = this.props;
+        const ratio = (value - min) / (max - min);
+        return ratio * 100;
+    }
+
+    calcValue(offset) {
+        const { min, max} = this.props;
+        const ratio = Math.abs(offset / this.getSliderLength());
+        const value = (ratio * (max - min)) + min;
+        return value;
+    }
+
+    calcValueByPos(position) {
+        const pixelOffset = position - this.getSliderStart();
+        const nextValue = this.trimAlignValue(this.calcValue(pixelOffset));
+        return nextValue;
+    }
+
+    addDocumentEvents(type) {
+        if (type === 'touch') {
+            // just work for chrome iOS Safari and Android Browser
+            this.onTouchMoveListener = addEventListener(document, 'touchmove', this.onTouchMove.bind(this));
+            this.onTouchUpListener = addEventListener(document, 'touchend', this.end.bind(this, 'touch'));
+        } else if (type === 'mouse') {
+            this.onMouseMoveListener = addEventListener(document, 'mousemove', this.onMouseMove.bind(this));
+            this.onMouseUpListener = addEventListener(document, 'mouseup', this.end.bind(this, 'mouse'));
+        }
+    }
+
+    removeEvents(type) {
+        if (type === 'touch') {
+            this.onTouchMoveListener.remove();
+            this.onTouchUpListener.remove();
+        } else if (type === 'mouse') {
+            this.onMouseMoveListener.remove();
+            this.onMouseUpListener.remove();
+        }
+    }
+
+    end(type) {
+        this.removeEvents(type);
+        this.props.onAfterChange(this.getValue());
+        this.setState({handle: null});
     }
 
     render() {
-        const {
-            prefixCls,
-            vertical,
-            included,
-            disabled,
-            minimumTrackStyle,
-            trackStyle,
-            handleStyle,
-            min,
-            max,
-            handle: handleGenerator,
-        } = this.props;
-        const { value, dragging } = this.state;
-        const offset = this.calcOffset(value);
-        const handle = handleGenerator({
-            className: `${prefixCls}-handle`,
-            vertical,
-            offset,
-            value,
-            dragging,
-            disabled,
-            min,
-            max,
-            index: 0,
-            style: handleStyle[0] || handleStyle,
-            ref: h => this.saveHandle(0, h),
+        const {handle, upperBound, lowerBound} = this.state;
+        const {className, prefixCls, disabled, vertical, dots, included, range, step,
+            marks, max, min, tipTransitionName, tipFormatter, children} = this.props;
+
+        const customHandle = this.props.handle;
+
+        const upperOffset = this.calcOffset(upperBound);
+        const lowerOffset = this.calcOffset(lowerBound);
+
+        const handleClassName = prefixCls + '-handle';
+
+        const upperClassName = handleClassName + ' ' + handleClassName + '-upper';
+        const lowerClassName = handleClassName + ' ' + handleClassName + '-lower';
+
+        const isNoTip = (step === null) || (tipFormatter === null);
+
+        const upper = cloneElement(customHandle, { className: upperClassName,
+            noTip: isNoTip, tipTransitionName: tipTransitionName, tipFormatter: tipFormatter,
+            offset: upperOffset, value: upperBound, dragging: handle === 'upperBound' });
+
+        let lower = null;
+        if (range) {
+            lower = cloneElement(customHandle, { className: lowerClassName,
+                noTip: isNoTip, tipTransitionName: tipTransitionName, tipFormatter: tipFormatter,
+                offset: lowerOffset, value: lowerBound, dragging: handle === 'lowerBound' });
+        }
+
+        const sliderClassName = classNames({
+            [prefixCls]: true,
+            [prefixCls + '-disabled']: disabled,
+            [className]: !!className
         });
-
-        const _trackStyle = trackStyle[0] || trackStyle;
-        const track = (
-            <Track
-                className={`${prefixCls}-track`}
-                vertical={vertical}
-                included={included}
-                offset={0}
-                length={offset}
-                style={{
-                    ...minimumTrackStyle,
-                    ..._trackStyle,
-                }}
-            />
+        const isIncluded = included || range;
+        return (
+            <div ref="slider" className={sliderClassName}
+                 onTouchStart={disabled ? noop : this.onTouchStart.bind(this)}
+                 onMouseDown={disabled ? noop : this.onMouseDown.bind(this)}>
+                {upper}
+                {lower}
+                <Track className={prefixCls + '-track'} included={isIncluded}
+                       offset={lowerOffset} length={upperOffset - lowerOffset}/>
+                {children}
+            </div>
         );
-
-        return { tracks: track, handles: handle };
     }
 }
 
-export default createSlider(Slider);
+Slider.propTypes = {
+    min: React.PropTypes.number,
+    max: React.PropTypes.number,
+    step: React.PropTypes.number,
+    defaultValue: React.PropTypes.oneOfType([
+        React.PropTypes.number,
+        React.PropTypes.arrayOf(React.PropTypes.number),
+    ]),
+    value: React.PropTypes.oneOfType([
+        React.PropTypes.number,
+        React.PropTypes.arrayOf(React.PropTypes.number),
+    ]),
+    marks: React.PropTypes.object,
+    included: React.PropTypes.bool,
+    className: React.PropTypes.string,
+    prefixCls: React.PropTypes.string,
+    disabled: React.PropTypes.bool,
+    children: React.PropTypes.any,
+    onBeforeChange: React.PropTypes.func,
+    onChange: React.PropTypes.func,
+    onAfterChange: React.PropTypes.func,
+    handle: React.PropTypes.element,
+    tipTransitionName: React.PropTypes.string,
+    tipFormatter: React.PropTypes.func,
+    dots: React.PropTypes.bool,
+    range: React.PropTypes.bool,
+    allowCross: React.PropTypes.bool,
+};
+
+Slider.defaultProps = {
+    prefixCls: 'rc-slider',
+    className: '',
+    tipTransitionName: '',
+    min: 0,
+    max: 100,
+    step: 1,
+    marks: {},
+    handle: <DefaultHandle />,
+    onBeforeChange: noop,
+    onChange: noop,
+    onAfterChange: noop,
+    tipFormatter: value => value,
+    included: true,
+    disabled: false,
+    dots: false,
+    range: false,
+    allowCross: true,
+};
+
+export default Slider;
