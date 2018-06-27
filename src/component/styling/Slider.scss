@@ -51,8 +51,18 @@
   cursor: grab;
   -ms-touch-action: pan-x;
   touch-action: pan-x;
-  background: rgb(0, 132, 156);
   top: -7px;
+  width: 12px;
+  height: 80px;
+}
+.rc-slider-handle-1 {
+  background: url('https://storage.googleapis.com/vibbio/drag_handle_left.png') no-repeat;
+  background-size: cover;
+}
+
+.rc-slider-handle-2 {
+  background: url('https://storage.googleapis.com/vibbio/drag_handle_right.png') no-repeat;
+  background-size: cover;
 }
 .rc-slider-handle:hover {
   border-color: #57c5f7;
@@ -99,15 +109,13 @@
 .rc-slider-disabled .rc-slider-track {
   background-color: #ccc;
 }
-.rc-slider-disabled .rc-slider-handle,
-.rc-slider-disabled .rc-slider-dot {
+.rc-slider-disabled .rc-slider-handle{
   border-color: #ccc;
   box-shadow: none;
   background-color: #fff;
   cursor: not-allowed;
 }
-.rc-slider-disabled .rc-slider-mark-text,
-.rc-slider-disabled .rc-slider-dot {
+.rc-slider-disabled .rc-slider-mark-text{
   cursor: not-allowed !important;
 }
 .rc-slider-vertical {
@@ -139,42 +147,7 @@
   height: 100%;
   width: 10px;
 }
-.rc-slider-vertical .rc-slider-dot {
-  left: 2px;
-  margin-bottom: -4px;
-}
-.rc-slider-vertical .rc-slider-dot:first-child {
-  margin-bottom: -4px;
-}
-.rc-slider-vertical .rc-slider-dot:last-child {
-  margin-bottom: -4px;
-}
-.rc-slider-tooltip-zoom-down-enter,
-.rc-slider-tooltip-zoom-down-appear {
-  -webkit-animation-duration: .3s;
-  animation-duration: .3s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-  display: block !important;
-  -webkit-animation-play-state: paused;
-  animation-play-state: paused;
-}
-.rc-slider-tooltip-zoom-down-leave {
-  -webkit-animation-duration: .3s;
-  animation-duration: .3s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-  display: block !important;
-  -webkit-animation-play-state: paused;
-  animation-play-state: paused;
-}
-.rc-slider-tooltip-zoom-down-enter.rc-slider-tooltip-zoom-down-enter-active,
-.rc-slider-tooltip-zoom-down-appear.rc-slider-tooltip-zoom-down-appear-active {
-  -webkit-animation-name: rcSliderTooltipZoomDownIn;
-  animation-name: rcSliderTooltipZoomDownIn;
-  -webkit-animation-play-state: running;
-  animation-play-state: running;
-}
+
 .rc-slider-tooltip-zoom-down-leave.rc-slider-tooltip-zoom-down-leave-active {
   -webkit-animation-name: rcSliderTooltipZoomDownOut;
   animation-name: rcSliderTooltipZoomDownOut;
@@ -287,8 +260,7 @@
   position: absolute;
   width: 0;
   height: 0;
-  border-color: transparent;
-  border-style: solid;
+  border: solid transparent;
 }
 .rc-slider-tooltip-placement-top .rc-slider-tooltip-arrow {
   bottom: 4px;
@@ -315,6 +287,8 @@
   left: -31px;
   border-radius: 3px;
   color: white;
+  cursor: -webkit-grab;
+  cursor: grab;
 }
 
 .rc-slider-track-1 {
@@ -335,4 +309,15 @@
   width: 2px;
   background: white;
   z-index: 2;
+  visibility: hidden;
+   &.is-playing {
+     visibility: visible;
+   }
+}
+
+.outside-range {
+  background: rgba(#25CBD3, 0.7);
+  height: 70px;
+  position: absolute;
+  top: 0;
 }

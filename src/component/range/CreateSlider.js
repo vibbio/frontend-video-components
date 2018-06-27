@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import addEventListener from 'rc-util/lib/Dom/addEventListener';
-import classNames from 'classnames';
+import classnames from 'classnames';
 import warning from 'warning';
 import Handle from './Handle';
 import * as utils from './utils';
@@ -23,18 +23,15 @@ export default function createSlider(Component) {
             onChange: PropTypes.func,
             onAfterChange: PropTypes.func,
             handle: PropTypes.func,
-            dots: PropTypes.bool,
             style: PropTypes.object,
             minimumTrackStyle: PropTypes.object, // just for compatibility, will be deperecate
             maximumTrackStyle: PropTypes.object, // just for compatibility, will be deperecate
             handleStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.arrayOf(PropTypes.object)]),
             trackStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.arrayOf(PropTypes.object)]),
             railStyle: PropTypes.object,
-            dotStyle: PropTypes.object,
-            activeDotStyle: PropTypes.object,
             autoFocus: PropTypes.bool,
             onFocus: PropTypes.func,
-            onBlur: PropTypes.func,
+            onBlur: PropTypes.func
         };
 
         static defaultProps = {
@@ -53,12 +50,9 @@ export default function createSlider(Component) {
             onAfterChange: noop,
             included: true,
             disabled: false,
-            dots: false,
             trackStyle: [{}],
             handleStyle: [{}],
-            railStyle: {},
-            dotStyle: {},
-            activeDotStyle: {},
+            railStyle: {}
         };
 
         constructor(props) {
@@ -261,7 +255,7 @@ export default function createSlider(Component) {
             } = this.props;
             const { tracks, handles } = super.render();
 
-            const sliderClassName = classNames(prefixCls, {
+            const sliderClassName = classnames(prefixCls, {
                 [`${prefixCls}-disabled`]: disabled,
                 [className]: className
             });

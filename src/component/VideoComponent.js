@@ -4,7 +4,7 @@ import classnames from 'classnames';
 import { findDOMNode } from 'react-dom';
 import screenfull from 'screenfull';
 
-import Range from './range/Slider';
+import Range from './range/Range';
 import ReactPlayer from './player/ReactPlayer';
 import './styling/index.scss';
 
@@ -36,9 +36,9 @@ class VideoComponent extends Component {
         this.setState({ playing: true });
     };
     onPause = () => {
-        if (this.state.playing) {
-            this.setState({ playedWhenStopped: this.state.played });
-        }
+        // if (this.state.playing) {
+        //     this.setState({ playedWhenStopped: this.state.played });
+        // }
         this.setState({ playing: false });
     };
     onSeekMouseDown = () => {
@@ -49,7 +49,7 @@ class VideoComponent extends Component {
         ];
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
-    onSeekChange = (e, handle) => {
+    onSeekChange = (e) => {
         const seekStart = e[0];
         const seekEnd = e[1];
 
@@ -62,9 +62,9 @@ class VideoComponent extends Component {
             prevSeekEnd
         ];
 
-        if (seekStart !== prevSeekStart && handle === 0) {
+        if (seekStart !== prevSeekStart) {
             updatedPrevSeek[0] = seekStart;
-        } else if (seekEnd !== prevSeekEnd && handle === 1) {
+        } else if (seekEnd !== prevSeekEnd) {
             updatedPrevSeek[1] = seekEnd;
         }
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
@@ -181,6 +181,8 @@ class VideoComponent extends Component {
         } = this.state;
 
         const maxValue = Math.floor(duration ? duration * 1000 : 10000);
+
+        console.log(100 - (((prevSeek[1] / 1000) / duration) * 100))
         return (
             <div className="time-marker-modal-content">
                 <div className="player-wrapper">
@@ -223,10 +225,6 @@ class VideoComponent extends Component {
                             max={maxValue}
                             defaultValue={[prevSeek[0], prevSeek[1]]}
                             allowCross
-                            handleStyle={[
-                                { height: '80px', width: '5px' },
-                                { height: '80px', width: '5px' }
-                            ]}
                             railStyle={{ backgroundColor: '#a8e5e8' }}
                             onMouseDown={this.onSeekMouseDown}
                             onChange={this.onSeekChange}
@@ -242,8 +240,19 @@ class VideoComponent extends Component {
                     ) : <noscript />}
                     <img src={imageUrl} role="presentation" className="image-strip" />
                     <div
-                        className="played-marker"
+                        className={classnames('played-marker', { 'is-playing': playing })}
                         style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
+                    />
+                    <div
+                        className="outside-range"
+                        style={{ width: `${((prevSeek[0] / 1000) / duration) * 100}%`, left: 0 }}
+                    />
+                    <div
+                        className="outside-range"
+                        style={{
+                            left: `${((prevSeek[1] / 1000) / duration) * 100}%`,
+                            width: `${100 - (((prevSeek[1] / 1000) / duration) * 100)}%`
+                        }}
                     />
                 </div>
                 {children}
@@ -253,6 +262,29 @@ class VideoComponent extends Component {
                 >
                     Apply selection
                 </button>
+                <h2>State</h2>
+                <table>
+                    <tbody>
+                    <tr>
+                        <th>url</th>
+                        <td className={!url ? 'faded' : ''}>
+                            {(url instanceof Array ? 'Multiple' : url) || 'null'}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>playing</th>
+                        <td>{playing ? 'true' : 'false'}</td>
+                    </tr>
+                    <tr>
+                        <th>prevSeek</th>
+                        <td>{`${this.state.prevSeek[0]} : ${this.state.prevSeek[1]}`}</td>
+                    </tr>
+                    <tr>
+                        <th>duration</th>
+                        <td>{duration}</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         );
     }

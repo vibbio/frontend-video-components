@@ -64,7 +64,7 @@ class Range extends React.Component {
 
         const data = { ...this.state, ...state };
         const changedValue = data.bounds;
-        props.onChange(changedValue, state.handle);
+        props.onChange(changedValue);
     }
 
     onStart(position) {
@@ -322,22 +322,7 @@ class Range extends React.Component {
         });
 
         const tracks = bounds.map((v, index) => {
-            const isLeftPart = index === 0;
-            const isRightPart = index === 1;
             const i = index + 1;
-
-            const playedOffset = this.calcOffset(this.props.played);
-            let leftOffset;
-            let rightOffset;
-
-            if (isLeftPart) {
-                leftOffset = offsets[i - 1];
-                rightOffset = playedOffset;
-            } else if (isRightPart) {
-                rightOffset = offsets[i - 1];
-                leftOffset = playedOffset;
-            }
-
             const trackClassName = classNames({
                 [`${prefixCls}-track`]: true,
                 [`${prefixCls}-track-${i}`]: true
@@ -346,8 +331,8 @@ class Range extends React.Component {
                 <Track
                     className={trackClassName}
                     included={included}
-                    offset={leftOffset}
-                    length={rightOffset - leftOffset}
+                    offset={offsets[i - 1]}
+                    length={offsets[i] - offsets[i - 1]}
                     style={trackStyle[index]}
                     index={i}
                     key={i}
