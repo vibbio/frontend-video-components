@@ -9,8 +9,6 @@ const Track = (props) => {
         width: `${length}%`
     };
 
-    // console.log('length: ', length);
-
     const elStyle = {
         visibility: included ? 'visible' : 'hidden',
         ...style,

@@ -10,8 +10,7 @@ class Slider extends React.Component {
     static propTypes = {
         defaultValue: PropTypes.number,
         value: PropTypes.number,
-        disabled: PropTypes.bool,
-        autoFocus: PropTypes.bool,
+        autoFocus: PropTypes.bool
     };
 
     constructor(props) {
@@ -39,8 +38,8 @@ class Slider extends React.Component {
     }
 
     componentDidMount() {
-        const { autoFocus, disabled } = this.props;
-        if (autoFocus && !disabled) {
+        const { autoFocus } = this.props;
+        if (autoFocus) {
             this.focus();
         }
     }
@@ -138,7 +137,6 @@ class Slider extends React.Component {
         const {
             prefixCls,
             included,
-            disabled,
             minimumTrackStyle,
             trackStyle,
             handleStyle,
@@ -153,7 +151,6 @@ class Slider extends React.Component {
             offset,
             value,
             dragging,
-            disabled,
             min,
             max,
             index: 0,

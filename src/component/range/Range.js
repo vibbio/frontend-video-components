@@ -289,7 +289,6 @@ class Range extends React.Component {
         const {
             prefixCls,
             included,
-            disabled,
             min,
             max,
             handle: handleGenerator,
@@ -315,7 +314,6 @@ class Range extends React.Component {
                 index: i,
                 min,
                 max,
-                disabled,
                 style: handleStyle[i],
                 ref: h => this.saveHandle(i, h)
             });
@@ -352,8 +350,7 @@ Range.propTypes = {
         PropTypes.bool,
         PropTypes.number
     ]),
-    allowCross: PropTypes.bool,
-    disabled: PropTypes.bool
+    allowCross: PropTypes.bool
 };
 
 Range.defaultProps = {

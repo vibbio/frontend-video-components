@@ -17,7 +17,6 @@ export default function createSlider(Component) {
             max: PropTypes.number,
             className: PropTypes.string,
             prefixCls: PropTypes.string,
-            disabled: PropTypes.bool,
             children: PropTypes.any,
             onBeforeChange: PropTypes.func,
             onChange: PropTypes.func,
@@ -49,7 +48,6 @@ export default function createSlider(Component) {
             onChange: noop,
             onAfterChange: noop,
             included: true,
-            disabled: false,
             trackStyle: [{}],
             handleStyle: [{}],
             railStyle: {}
@@ -188,15 +186,11 @@ export default function createSlider(Component) {
         }
 
         focus() {
-            if (!this.props.disabled) {
-                this.handlesRefs[0].focus();
-            }
+            this.handlesRefs[0].focus();
         }
 
         blur() {
-            if (!this.props.disabled) {
-                this.handlesRefs[0].blur();
-            }
+            this.handlesRefs[0].blur();
         }
 
         getSliderStart() {
@@ -247,7 +241,6 @@ export default function createSlider(Component) {
             const {
                 prefixCls,
                 className,
-                disabled,
                 children,
                 maximumTrackStyle,
                 style,
@@ -256,19 +249,18 @@ export default function createSlider(Component) {
             const { tracks, handles } = super.render();
 
             const sliderClassName = classnames(prefixCls, {
-                [`${prefixCls}-disabled`]: disabled,
                 [className]: className
             });
             return (
                 <div
                     ref={this.saveSlider}
                     className={sliderClassName}
-                    onTouchStart={disabled ? noop : this.onTouchStart}
-                    onMouseDown={disabled ? noop : this.onMouseDown}
-                    onMouseUp={disabled ? noop : this.onMouseUp}
-                    onKeyDown={disabled ? noop : this.onKeyDown}
-                    onFocus={disabled ? noop : this.onFocus}
-                    onBlur={disabled ? noop : this.onBlur}
+                    onTouchStart={this.onTouchStart}
+                    onMouseDown={this.onMouseDown}
+                    onMouseUp={this.onMouseUp}
+                    onKeyDown={this.onKeyDown}
+                    onFocus={this.onFocus}
+                    onBlur={this.onBlur}
                     style={style}
                 >
                     <div

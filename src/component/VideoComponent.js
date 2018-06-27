@@ -182,7 +182,6 @@ class VideoComponent extends Component {
 
         const maxValue = Math.floor(duration ? duration * 1000 : 10000);
 
-        console.log(100 - (((prevSeek[1] / 1000) / duration) * 100))
         return (
             <div className="time-marker-modal-content">
                 <div className="player-wrapper">

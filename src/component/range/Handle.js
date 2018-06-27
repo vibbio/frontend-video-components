@@ -14,7 +14,7 @@ class Handle extends Component {
 
     render() {
         const {
-            index, className, offset, style, disabled, min, max, value, ...restProps
+            index, className, offset, style, min, max, value, ...restProps
         } = this.props;
 
         const positionStyle = { left: `${offset}%` };
@@ -27,8 +27,7 @@ class Handle extends Component {
                 ...ariaProps,
                 'aria-valuemin': min,
                 'aria-valuemax': max,
-                'aria-valuenow': value,
-                'aria-disabled': !!disabled
+                'aria-valuenow': value
             };
         }
 
@@ -57,7 +56,6 @@ Handle.propTypes = {
     dragging: PropTypes.bool,
     offset: PropTypes.number,
     style: PropTypes.object,
-    disabled: PropTypes.bool,
     min: PropTypes.number,
     max: PropTypes.number,
     value: PropTypes.number
