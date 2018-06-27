@@ -109,7 +109,6 @@ class Range extends React.Component {
 
     onMove(e, position) {
         utils.pauseEvent(e);
-        const { allowCross } = this.props;
         const { handle, bounds } = this.state;
 
         const value = this.calcValueByPos(position);
@@ -123,10 +122,9 @@ class Range extends React.Component {
         if (pushableOn && (nextHandle === 0 || nextHandle === 2)) {
             const originalValue = bounds[nextHandle];
             this.pushSurroundingHandles(nextBounds, nextHandle, originalValue);
-        } else if (allowCross) {
-            nextBounds.sort((a, b) => a - b);
-            nextHandle = nextBounds.indexOf(value);
         }
+        nextBounds.sort((a, b) => a - b);
+        nextHandle = nextBounds.indexOf(value);
         this.onChange({
             handle: nextHandle,
             bounds: nextBounds
@@ -261,24 +259,7 @@ class Range extends React.Component {
     trimAlignValue(v, nextProps = {}) {
         const mergedProps = { ...this.props, ...nextProps };
         const valInRange = utils.ensureValueInRange(v, mergedProps);
-        const valNotConflict = this.ensureValueNotConflict(valInRange, mergedProps);
-        return utils.ensureValuePrecision(valNotConflict, mergedProps);
-    }
-
-    ensureValueNotConflict(val, { allowCross }) {
-        const state = this.state || {};
-        const { handle, bounds } = state;
-        /* eslint-disable eqeqeq */
-        if (!allowCross && handle != null) {
-            if (handle > 0 && val <= bounds[handle - 1]) {
-                return bounds[handle - 1];
-            }
-            if (handle < bounds.length - 1 && val >= bounds[handle + 1]) {
-                return bounds[handle + 1];
-            }
-        }
-        /* eslint-enable eqeqeq */
-        return val;
+        return utils.ensureValuePrecision(valInRange, mergedProps);
     }
 
     render() {
@@ -288,7 +269,6 @@ class Range extends React.Component {
         } = this.state;
         const {
             prefixCls,
-            included,
             min,
             max,
             handle: handleGenerator,
@@ -328,7 +308,6 @@ class Range extends React.Component {
             return (
                 <Track
                     className={trackClassName}
-                    included={included}
                     offset={offsets[i - 1]}
                     length={offsets[i] - offsets[i - 1]}
                     style={trackStyle[index]}
@@ -349,13 +328,11 @@ Range.propTypes = {
     pushable: PropTypes.oneOfType([
         PropTypes.bool,
         PropTypes.number
-    ]),
-    allowCross: PropTypes.bool
+    ])
 };
 
 Range.defaultProps = {
     count: 1,
-    allowCross: true,
     pushable: false
 };
 

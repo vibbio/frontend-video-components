@@ -137,11 +137,11 @@
 
 .played-marker {
   position: absolute;
-  top: 0;
-  height: 34px;
+  top: -5px;
+  height: 80px;
   width: 2px;
-  background: white;
-  z-index: 2;
+  background: #25CBD3;
+  z-index: 5;
   visibility: hidden;
    &.is-playing {
      visibility: visible;

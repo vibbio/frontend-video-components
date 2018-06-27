@@ -36,9 +36,6 @@ class VideoComponent extends Component {
         this.setState({ playing: true });
     };
     onPause = () => {
-        // if (this.state.playing) {
-        //     this.setState({ playedWhenStopped: this.state.played });
-        // }
         this.setState({ playing: false });
     };
     onSeekMouseDown = () => {
@@ -223,18 +220,10 @@ class VideoComponent extends Component {
                             min={0}
                             max={maxValue}
                             defaultValue={[prevSeek[0], prevSeek[1]]}
-                            allowCross
-                            railStyle={{ backgroundColor: '#a8e5e8' }}
                             onMouseDown={this.onSeekMouseDown}
                             onChange={this.onSeekChange}
                             onMouseUp={this.onSeekMouseUp}
                             prevSeek={[prevSeek[0], prevSeek[1]]}
-                            playing={playing}
-                            played={played * duration * 1000}
-                            // style={{
-                            //     background: `url(${imageUrl})`,
-                            //     backgroundSize: '100% 70px, cover'
-                            // }}
                         />
                     ) : <noscript />}
                     <img src={imageUrl} role="presentation" className="image-strip" />
@@ -261,29 +250,6 @@ class VideoComponent extends Component {
                 >
                     Apply selection
                 </button>
-                <h2>State</h2>
-                <table>
-                    <tbody>
-                    <tr>
-                        <th>url</th>
-                        <td className={!url ? 'faded' : ''}>
-                            {(url instanceof Array ? 'Multiple' : url) || 'null'}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>playing</th>
-                        <td>{playing ? 'true' : 'false'}</td>
-                    </tr>
-                    <tr>
-                        <th>prevSeek</th>
-                        <td>{`${this.state.prevSeek[0]} : ${this.state.prevSeek[1]}`}</td>
-                    </tr>
-                    <tr>
-                        <th>duration</th>
-                        <td>{duration}</td>
-                    </tr>
-                    </tbody>
-                </table>
             </div>
         );
     }

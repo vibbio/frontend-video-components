@@ -2,7 +2,7 @@ import React from 'react';
 import PT from 'prop-types';
 
 const Track = (props) => {
-    const { className, included, offset, length, style } = props;
+    const { className, offset, length, style } = props;
 
     const positionStyle = {
         left: `${offset}%`,
@@ -10,7 +10,7 @@ const Track = (props) => {
     };
 
     const elStyle = {
-        visibility: included ? 'visible' : 'hidden',
+        visibility: 'hidden',
         ...style,
         ...positionStyle
     };
@@ -21,8 +21,7 @@ Track.propTypes = {
     className: PT.string,
     offset: PT.number,
     length: PT.number,
-    style: PT.object,
-    included: PT.bool
+    style: PT.object
 };
 
 export default Track;

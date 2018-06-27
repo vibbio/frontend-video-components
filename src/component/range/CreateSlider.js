@@ -23,8 +23,6 @@ export default function createSlider(Component) {
             onAfterChange: PropTypes.func,
             handle: PropTypes.func,
             style: PropTypes.object,
-            minimumTrackStyle: PropTypes.object, // just for compatibility, will be deperecate
-            maximumTrackStyle: PropTypes.object, // just for compatibility, will be deperecate
             handleStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.arrayOf(PropTypes.object)]),
             trackStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.arrayOf(PropTypes.object)]),
             railStyle: PropTypes.object,
@@ -47,7 +45,6 @@ export default function createSlider(Component) {
             onBeforeChange: noop,
             onChange: noop,
             onAfterChange: noop,
-            included: true,
             trackStyle: [{}],
             handleStyle: [{}],
             railStyle: {}
@@ -94,7 +91,7 @@ export default function createSlider(Component) {
             this.onStart(position);
             this.addDocumentMouseEvents();
             utils.pauseEvent(e);
-        }
+        };
 
         onTouchStart = (e) => {
             if (utils.isNotTouchEvent(e)) return;
@@ -110,7 +107,7 @@ export default function createSlider(Component) {
             this.onStart(position);
             this.addDocumentTouchEvents();
             utils.pauseEvent(e);
-        }
+        };
 
         onFocus = (e) => {
             const { onFocus } = this.props;
@@ -123,7 +120,7 @@ export default function createSlider(Component) {
                     onFocus(e);
                 }
             }
-        }
+        };
 
         onBlur = (e) => {
             const { onBlur } = this.props;
@@ -158,7 +155,7 @@ export default function createSlider(Component) {
             this.onEnd();
             this.onMouseUpClick();
             this.removeDocumentEvents();
-        }
+        };
 
         onMouseMove = (e) => {
             if (!this.sliderRef) {
@@ -167,7 +164,7 @@ export default function createSlider(Component) {
             }
             const position = utils.getMousePosition(e);
             this.onMove(e, position - this.dragOffset);
-        }
+        };
 
         onTouchMove = (e) => {
             if (utils.isNotTouchEvent(e) || !this.sliderRef) {
@@ -177,13 +174,13 @@ export default function createSlider(Component) {
 
             const position = utils.getTouchPosition(e);
             this.onMove(e, position - this.dragOffset);
-        }
+        };
 
         onKeyDown = (e) => {
             if (this.sliderRef && utils.isEventFromHandle(e, this.handlesRefs)) {
                 this.onKeyboard(e);
             }
-        }
+        };
 
         focus() {
             this.handlesRefs[0].focus();
@@ -213,14 +210,12 @@ export default function createSlider(Component) {
         calcValue(offset) {
             const { min, max } = this.props;
             const ratio = Math.abs(Math.max(offset, 0) / this.getSliderLength());
-            const value = (ratio * (max - min)) + min;
-            return value;
+            return (ratio * (max - min)) + min;
         }
 
         calcValueByPos(position) {
             const pixelOffset = position - this.getSliderStart();
-            const nextValue = this.trimAlignValue(this.calcValue(pixelOffset));
-            return nextValue;
+            return this.trimAlignValue(this.calcValue(pixelOffset));
         }
 
         calcOffset(value) {
@@ -231,30 +226,20 @@ export default function createSlider(Component) {
 
         saveSlider = (slider) => {
             this.sliderRef = slider;
-        }
+        };
 
         saveHandle(index, handle) {
             this.handlesRefs[index] = handle;
         }
 
         render() {
-            const {
-                prefixCls,
-                className,
-                children,
-                maximumTrackStyle,
-                style,
-                railStyle
-            } = this.props;
+            const { prefixCls, className, children, style, railStyle } = this.props;
             const { tracks, handles } = super.render();
 
-            const sliderClassName = classnames(prefixCls, {
-                [className]: className
-            });
             return (
                 <div
                     ref={this.saveSlider}
-                    className={sliderClassName}
+                    className={classnames(prefixCls, { [className]: className })}
                     onTouchStart={this.onTouchStart}
                     onMouseDown={this.onMouseDown}
                     onMouseUp={this.onMouseUp}
@@ -263,13 +248,7 @@ export default function createSlider(Component) {
                     onBlur={this.onBlur}
                     style={style}
                 >
-                    <div
-                        className={`${prefixCls}-rail`}
-                        style={{
-                            ...maximumTrackStyle,
-                            ...railStyle
-                        }}
-                    />
+                    <div className={`${prefixCls}-rail`} style={railStyle} />
                     {tracks}
                     {handles}
                     {children}

@@ -23,18 +23,8 @@ class Slider extends React.Component {
 
         this.state = {
             value: this.trimAlignValue(value),
-            dragging: false,
+            dragging: false
         };
-        if (process.env.NODE_ENV !== 'production') {
-            warning(
-                !('minimumTrackStyle' in props),
-                'minimumTrackStyle will be deprecate, please use trackStyle instead.'
-            );
-            warning(
-                !('maximumTrackStyle' in props),
-                'maximumTrackStyle will be deprecate, please use railStyle instead.'
-            );
-        }
     }
 
     componentDidMount() {
@@ -136,8 +126,6 @@ class Slider extends React.Component {
     render() {
         const {
             prefixCls,
-            included,
-            minimumTrackStyle,
             trackStyle,
             handleStyle,
             min,
@@ -162,13 +150,9 @@ class Slider extends React.Component {
         const track = (
             <Track
                 className={`${prefixCls}-track`}
-                included={included}
                 offset={0}
                 length={offset}
-                style={{
-                    ...minimumTrackStyle,
-                    ...style
-                }}
+                style={style}
             />
         );
 
