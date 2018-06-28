@@ -33,6 +33,12 @@ class VideoComponent extends Component {
         this.load(this.props.url, this.props.startTime, this.props.endTime);
     }
     onPlay = () => {
+        const { playedWhenStopped, prevSeek, duration } = this.state;
+        const playedWhenStoppedMilli = playedWhenStopped * duration * 1000;
+        if (prevSeek[0] < playedWhenStoppedMilli && playedWhenStoppedMilli < prevSeek[1]) {
+            this.setState({ playing: true, played: playedWhenStopped, seeking: false });
+            return;
+        }
         this.setState({ playing: true });
     };
     onPause = () => {
@@ -112,7 +118,7 @@ class VideoComponent extends Component {
                 ready: true,
                 duration,
                 prevSeek: [prevSeekStart, prevSeekEnd],
-                played: initialPlayed // startTime + 1
+                played: initialPlayed
             });
             if (startTime > 0) {
                 this.player.seekTo(startTime);
@@ -121,17 +127,20 @@ class VideoComponent extends Component {
         }
     };
     playPause = () => {
-        if (this.state.playing) {
-            const prevSeek = [
-                this.state.prevSeek[0],
-                this.state.prevSeek[1]
-            ];
-            this.setState({ playing: false, prevSeek });
+        const { playing, playedWhenStopped, prevSeek, played, duration } = this.state;
+        if (playing) {
+            this.setState({ playing: false, prevSeek: [...prevSeek], playedWhenStopped: played });
             return;
         }
-        const playSeekMarker = this.state.prevSeek[0];
+        const playedWhenStoppedMilli = playedWhenStopped * duration * 1000;
+        if (prevSeek[0] < playedWhenStoppedMilli && playedWhenStoppedMilli < prevSeek[1]) {
+            this.player.seekTo(playedWhenStopped);
+            this.setState({ playing: true, played: playedWhenStopped, seeking: false });
+            return;
+        }
+        const playSeekMarker = prevSeek[0];
         const timeFraction = parseFloat(playSeekMarker);
-        const seekTo = timeFraction / (this.state.duration * 1000);
+        const seekTo = timeFraction / (duration * 1000);
         this.player.seekTo(seekTo);
         this.setState({ playing: true, played: seekTo, seeking: false });
     };
@@ -174,7 +183,7 @@ class VideoComponent extends Component {
         const { imageUrl, timeMarkerButtonFunction, children } = this.props;
         const {
             url, playing, volume, muted, prevSeek, duration, playbackRate,
-            played, loaded, fileConfig, ready, playedWhenStopped
+            played, fileConfig, ready, playedWhenStopped
         } = this.state;
 
         const maxValue = Math.floor(duration ? duration * 1000 : 10000);
@@ -192,7 +201,7 @@ class VideoComponent extends Component {
                         playbackRate={playbackRate}
                         volume={volume}
                         muted={muted}
-                        seeking={this.state.seeking}
+                        seeking={`${this.state.seeking}`}
                         prevSeek={prevSeek}
                         fileConfig={fileConfig}
                         isReady={this.isReady}
@@ -212,7 +221,6 @@ class VideoComponent extends Component {
                             </div>
                         </div>
                     </button>
-                    <div className={classnames('is-loading', { loading: loaded < 0.2 })} />
                 </div>
                 <div className="slider-wrapper">
                     {ready ? (

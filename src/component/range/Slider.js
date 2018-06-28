@@ -22,8 +22,7 @@ class Slider extends React.Component {
             props.value : defaultValue;
 
         this.state = {
-            value: this.trimAlignValue(value),
-            dragging: false
+            value: this.trimAlignValue(value)
         };
     }
 
@@ -61,7 +60,6 @@ class Slider extends React.Component {
     }
 
     onStart(position) {
-        this.setState({ dragging: true });
         const props = this.props;
         const prevValue = this.getValue();
         props.onBeforeChange(prevValue);
@@ -76,7 +74,6 @@ class Slider extends React.Component {
     }
 
     onEnd = () => {
-        this.setState({ dragging: false });
         this.removeDocumentEvents();
         this.props.onAfterChange(this.getValue());
     }
@@ -132,13 +129,12 @@ class Slider extends React.Component {
             max,
             handle: handleGenerator,
         } = this.props;
-        const { value, dragging } = this.state;
+        const { value } = this.state;
         const offset = this.calcOffset(value);
         const handle = handleGenerator({
             className: `${prefixCls}-handle`,
             offset,
             value,
-            dragging,
             min,
             max,
             index: 0,

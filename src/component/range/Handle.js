@@ -53,7 +53,6 @@ class Handle extends Component {
 Handle.propTypes = {
     index: PropTypes.number,
     className: PropTypes.string,
-    dragging: PropTypes.bool,
     offset: PropTypes.number,
     style: PropTypes.object,
     min: PropTypes.number,

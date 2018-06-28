@@ -280,7 +280,7 @@ class Range extends React.Component {
 
         const handleClassName = `${prefixCls}-handle`;
         const handles = bounds.map((v, i) => {
-            const dragging = (handle !== null) && (handle === i);
+            const dragging = `${(handle !== null) && (handle === i)}`;
             const offset = offsets[i];
 
             return handleGenerator({

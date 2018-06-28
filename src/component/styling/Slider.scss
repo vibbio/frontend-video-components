@@ -141,11 +141,8 @@
   height: 80px;
   width: 2px;
   background: #25CBD3;
-  z-index: 5;
-  visibility: hidden;
-   &.is-playing {
-     visibility: visible;
-   }
+  z-index: 3;
+  visibility: visible;
 }
 
 .outside-range {
