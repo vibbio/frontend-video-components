@@ -201,7 +201,7 @@ class VideoComponent extends Component {
                         playbackRate={playbackRate}
                         volume={volume}
                         muted={muted}
-                        seeking={`${this.state.seeking}`}
+                        seeking={this.state.seeking}
                         prevSeek={prevSeek}
                         fileConfig={fileConfig}
                         isReady={this.isReady}
@@ -236,7 +236,7 @@ class VideoComponent extends Component {
                     ) : <noscript />}
                     <img src={imageUrl} role="presentation" className="image-strip" />
                     <div
-                        className={classnames('played-marker', { 'is-playing': playing })}
+                        className="played-marker"
                         style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
                     />
                     <div
