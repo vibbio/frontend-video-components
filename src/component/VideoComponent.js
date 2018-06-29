@@ -211,9 +211,9 @@ class VideoComponent extends Component {
                         onProgress={this.onProgress}
                         onDuration={newDuration => this.setState({ duration: newDuration })}
                     />
-                    <button className="play-button-wrapper" onClick={this.playPause}>
-                        <div className="time-marker-button-wrapper">
-                            <div className={classnames('time-marker-button', { 'pause-button': playing })}>
+                    <button className="time-marker-play-button" onClick={this.playPause}>
+                        <div className="time-marker-button-content-wrapper">
+                            <div className={classnames('time-marker-button-icon', { 'pause-button': playing })}>
                                 {playing ?
                                     <i className="material-icons">pause</i> :
                                     <i className="material-icons">play_arrow</i>
@@ -252,12 +252,14 @@ class VideoComponent extends Component {
                     />
                 </div>
                 {children}
-                <button
-                    onClick={() => timeMarkerButtonFunction(prevSeek, duration)}
-                    className="button primary-button time-marker-modal-content-button"
-                >
-                    Apply selection
-                </button>
+                <div className="button-box time-marker-apply-selection-wrapper">
+                    <button
+                        onClick={() => timeMarkerButtonFunction(prevSeek, duration)}
+                        className="button primary-button time-marker-apply-selection-button"
+                    >
+                        Apply selection
+                    </button>
+                </div>
             </div>
         );
     }

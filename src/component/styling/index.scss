@@ -13,7 +13,7 @@
   }
 }
 
-.play-button-wrapper {
+.time-marker-play-button {
   width: 100%;
   height: 96%;
   top: 0;
@@ -28,7 +28,7 @@
   }
 }
 
-.time-marker-button-wrapper {
+.time-marker-button-content-wrapper {
   left: 50%;
   top: 50%;
   -webkit-transform: translate(-50%, -50%);
@@ -42,7 +42,7 @@
 }
 
 
-.time-marker-button {
+.time-marker-button-icon {
   background: white;
   text-transform: uppercase;
   height: 40px;
