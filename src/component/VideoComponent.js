@@ -7,6 +7,7 @@ import screenfull from 'screenfull';
 import Range from './range/Range';
 import ReactPlayer from './player/ReactPlayer';
 import './styling/index.scss';
+import { calculateLength } from './utils';
 
 class VideoComponent extends Component {
     constructor(props) {
@@ -251,6 +252,7 @@ class VideoComponent extends Component {
                                 width: `${100 - (((prevSeek[1] / 1000) / duration) * 100)}%`
                             }}
                         />
+                        <p className="time-marker-length">{`${calculateLength(prevSeek[0], prevSeek[1])} sec`}</p>
                     </div>
                     {children}
                 </div>
