@@ -180,7 +180,7 @@ class VideoComponent extends Component {
     };
 
     render() {
-        const { imageUrl, timeMarkerButtonFunction, children } = this.props;
+        const { imageUrl, timeMarkerButtonFunction, cancelFunction, children } = this.props;
         const {
             url, playing, volume, muted, prevSeek, duration, playbackRate,
             played, fileConfig, ready, playedWhenStopped
@@ -190,69 +190,77 @@ class VideoComponent extends Component {
 
         return (
             <div className="time-marker-modal-content">
-                <div className="player-wrapper">
-                    <ReactPlayer
-                        ref={this.ref}
-                        className="react-player"
-                        width="100%"
-                        height="100%"
-                        url={url}
-                        playing={playing}
-                        playbackRate={playbackRate}
-                        volume={volume}
-                        muted={muted}
-                        seeking={this.state.seeking}
-                        prevSeek={prevSeek}
-                        fileConfig={fileConfig}
-                        isReady={this.isReady}
-                        startLoop={this.startLoop}
-                        onPlay={this.onPlay}
-                        onPause={this.onPause}
-                        onProgress={this.onProgress}
-                        onDuration={newDuration => this.setState({ duration: newDuration })}
-                    />
-                    <button className="time-marker-play-button" onClick={this.playPause}>
-                        <div className="time-marker-button-content-wrapper">
-                            <div className={classnames('time-marker-button-icon', { 'pause-button': playing })}>
-                                {playing ?
-                                    <i className="material-icons">pause</i> :
-                                    <i className="material-icons">play_arrow</i>
-                                }
-                            </div>
-                        </div>
-                    </button>
-                </div>
-                <div className="slider-wrapper">
-                    {ready ? (
-                        <Range
-                            min={0}
-                            max={maxValue}
-                            defaultValue={[prevSeek[0], prevSeek[1]]}
-                            onMouseDown={this.onSeekMouseDown}
-                            onChange={this.onSeekChange}
-                            onMouseUp={this.onSeekMouseUp}
-                            prevSeek={[prevSeek[0], prevSeek[1]]}
+                <div className="time-marker-content">
+                    <div className="player-wrapper">
+                        <ReactPlayer
+                            ref={this.ref}
+                            className="react-player"
+                            width="100%"
+                            height="100%"
+                            url={url}
+                            playing={playing}
+                            playbackRate={playbackRate}
+                            volume={volume}
+                            muted={muted}
+                            seeking={this.state.seeking}
+                            prevSeek={prevSeek}
+                            fileConfig={fileConfig}
+                            isReady={this.isReady}
+                            startLoop={this.startLoop}
+                            onPlay={this.onPlay}
+                            onPause={this.onPause}
+                            onProgress={this.onProgress}
+                            onDuration={newDuration => this.setState({ duration: newDuration })}
                         />
-                    ) : <noscript />}
-                    <img src={imageUrl} role="presentation" className="image-strip" />
-                    <div
-                        className="played-marker"
-                        style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
-                    />
-                    <div
-                        className="outside-range"
-                        style={{ width: `${((prevSeek[0] / 1000) / duration) * 100}%`, left: 0 }}
-                    />
-                    <div
-                        className="outside-range"
-                        style={{
-                            left: `${((prevSeek[1] / 1000) / duration) * 100}%`,
-                            width: `${100 - (((prevSeek[1] / 1000) / duration) * 100)}%`
-                        }}
-                    />
+                        <button className="time-marker-play-button" onClick={this.playPause}>
+                            <div className="time-marker-button-content-wrapper">
+                                <div className={classnames('time-marker-button-icon', { 'pause-button': playing })}>
+                                    {playing ?
+                                        <i className="material-icons">pause</i> :
+                                        <i className="material-icons">play_arrow</i>
+                                    }
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+                    <div className="slider-wrapper">
+                        {ready ? (
+                            <Range
+                                min={0}
+                                max={maxValue}
+                                defaultValue={[prevSeek[0], prevSeek[1]]}
+                                onMouseDown={this.onSeekMouseDown}
+                                onChange={this.onSeekChange}
+                                onMouseUp={this.onSeekMouseUp}
+                                prevSeek={[prevSeek[0], prevSeek[1]]}
+                            />
+                        ) : <noscript />}
+                        <img src={imageUrl} role="presentation" className="image-strip" />
+                        <div
+                            className="played-marker"
+                            style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
+                        />
+                        <div
+                            className="outside-range"
+                            style={{ width: `${((prevSeek[0] / 1000) / duration) * 100}%`, left: 0 }}
+                        />
+                        <div
+                            className="outside-range"
+                            style={{
+                                left: `${((prevSeek[1] / 1000) / duration) * 100}%`,
+                                width: `${100 - (((prevSeek[1] / 1000) / duration) * 100)}%`
+                            }}
+                        />
+                    </div>
+                    {children}
                 </div>
-                {children}
                 <div className="button-box time-marker-apply-selection-wrapper">
+                    <button
+                        onClick={cancelFunction}
+                        className="button secondary-button time-marker-cancel-selection-button"
+                    >
+                        Cancel
+                    </button>
                     <button
                         onClick={() => timeMarkerButtonFunction(prevSeek, duration)}
                         className="button primary-button time-marker-apply-selection-button"
@@ -267,6 +275,7 @@ class VideoComponent extends Component {
 
 VideoComponent.propTypes = {
     timeMarkerButtonFunction: PT.func.isRequired,
+    cancelFunction: PT.func.isRequired,
     children: PT.node.isRequired,
     imageUrl: PT.string.isRequired,
     url: PT.string.isRequired,
