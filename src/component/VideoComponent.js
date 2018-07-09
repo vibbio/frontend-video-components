@@ -4,24 +4,17 @@ import classnames from 'classnames';
 import { findDOMNode } from 'react-dom';
 import screenfull from 'screenfull';
 
-import Range from './range/Range';
 import ReactPlayer from './player/ReactPlayer';
 import './styling/index.scss';
-import { calculateLength } from './utils';
 
 class VideoComponent extends Component {
     constructor(props) {
         super(props);
         this.load = this.load.bind(this);
-        this.onSeekMouseDown = this.onSeekMouseDown.bind(this);
-        this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
-        this.startLoop = this.startLoop.bind(this);
     }
     state = {
         url: null,
         playing: false,
-        volume: 0.8,
-        muted: false,
         played: 0,
         prevSeek: [0, 100],
         loaded: 0,
@@ -45,85 +38,30 @@ class VideoComponent extends Component {
     onPause = () => {
         this.setState({ playing: false });
     };
-    onSeekMouseDown = () => {
-        this.onPause();
-        const updatedPrevSeek = [
-            this.state.prevSeek[0],
-            this.state.prevSeek[1]
-        ];
-        this.setState({ seeking: true, prevSeek: updatedPrevSeek });
-    };
-    onSeekChange = (e) => {
-        const seekStart = e[0];
-        const seekEnd = e[1];
-
-        const { prevSeek } = this.state;
-        const prevSeekStart = prevSeek[0];
-        const prevSeekEnd = prevSeek[1];
-
-        const updatedPrevSeek = [
-            prevSeekStart,
-            prevSeekEnd
-        ];
-
-        if (seekStart !== prevSeekStart) {
-            updatedPrevSeek[0] = seekStart;
-        } else if (seekEnd !== prevSeekEnd) {
-            updatedPrevSeek[1] = seekEnd;
-        }
-        this.setState({ seeking: true, prevSeek: updatedPrevSeek });
-    };
-    onSeekMouseUp = () => {
-        const { prevSeek, duration, played } = this.state;
-        const prevSeekStart = prevSeek[0];
-        const prevSeekEnd = prevSeek[1];
-        const timeFractionStart = parseFloat(prevSeekStart);
-        const seekToStart = timeFractionStart / (duration * 1000);
-
-        const timeFractionEnd = parseFloat(prevSeekEnd);
-        const seekToEnd = timeFractionEnd / (duration * 1000);
-
-        const startDiff = Math.abs(played - seekToStart);
-        const endDiff = Math.abs(played - seekToEnd);
-        if (endDiff > startDiff) {
-            this.player.seekTo(seekToEnd);
-            this.setState({ seeking: false, playing: false, played: seekToEnd });
-            return;
-        }
-
-        this.player.seekTo(seekToStart);
-        this.setState({ seeking: false, playing: false, played: seekToStart });
-
-    };
-
-    setVolume = (e) => {
-        this.setState({ volume: parseFloat(e.target.value) });
-    };
 
     setPlaybackRate = (e) => {
         this.setState({ playbackRate: parseFloat(e.target.value) });
     };
-    startLoop = (loopStart) => {
-        this.setState({ played: loopStart });
-    };
     isReady = (duration) => {
         if (!this.state.ready) {
-            this.setState({ seeking: true });
             const { startTime, endTime } = this.props;
             const prevSeekStart = startTime ? Math.floor(startTime * 1000) : 0;
             const prevSeekEnd = endTime ? Math.floor(endTime * 1000) : duration * 1000;
 
-            const initialPlayed = startTime / (this.state.duration * 1000);
+            const initialPlayed = this.state.duration ?
+                startTime / (this.state.duration * 1000) : 0;
+
+            if (startTime > 0) {
+                this.player.seekTo(startTime);
+            }
 
             this.setState({
                 ready: true,
                 duration,
                 prevSeek: [prevSeekStart, prevSeekEnd],
-                played: initialPlayed
+                played: initialPlayed,
+                playing: true
             });
-            if (startTime > 0) {
-                this.player.seekTo(startTime);
-            }
             this.setState({ seeking: false });
         }
     };
@@ -147,9 +85,6 @@ class VideoComponent extends Component {
     };
     stop = () => {
         this.setState({ url: null, playing: false });
-    };
-    toggleMuted = () => {
-        this.setState({ muted: !this.state.muted });
     };
     load = (url) => {
         this.setState({
@@ -181,14 +116,7 @@ class VideoComponent extends Component {
     };
 
     render() {
-        const { imageUrl, timeMarkerButtonFunction, cancelFunction, children } = this.props;
-        const {
-            url, playing, volume, muted, prevSeek, duration, playbackRate,
-            played, fileConfig, ready, playedWhenStopped
-        } = this.state;
-
-        const maxValue = Math.floor(duration ? duration * 1000 : 10000);
-
+        const { url, playing, prevSeek, playbackRate, fileConfig } = this.state;
         return (
             <div className="time-marker-modal-content">
                 <div className="time-marker-content">
@@ -201,16 +129,16 @@ class VideoComponent extends Component {
                             url={url}
                             playing={playing}
                             playbackRate={playbackRate}
-                            volume={volume}
-                            muted={muted}
+                            volume={0.8}
+                            muted={false}
                             seeking={this.state.seeking}
                             prevSeek={prevSeek}
                             fileConfig={fileConfig}
                             isReady={this.isReady}
-                            startLoop={this.startLoop}
                             onPlay={this.onPlay}
                             onPause={this.onPause}
                             onProgress={this.onProgress}
+                            onEnded={this.props.onEndFunction}
                             onDuration={newDuration => this.setState({ duration: newDuration })}
                         />
                         <button className="time-marker-play-button" onClick={this.playPause}>
@@ -224,51 +152,6 @@ class VideoComponent extends Component {
                             </div>
                         </button>
                     </div>
-                    <div className="slider-wrapper">
-                        {ready ? (
-                            <Range
-                                min={0}
-                                max={maxValue}
-                                defaultValue={[prevSeek[0], prevSeek[1]]}
-                                onMouseDown={this.onSeekMouseDown}
-                                onChange={this.onSeekChange}
-                                onMouseUp={this.onSeekMouseUp}
-                                prevSeek={[prevSeek[0], prevSeek[1]]}
-                            />
-                        ) : <noscript />}
-                        <img src={imageUrl} role="presentation" className="image-strip" />
-                        <div
-                            className="played-marker"
-                            style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
-                        />
-                        <div
-                            className="outside-range"
-                            style={{ width: `${((prevSeek[0] / 1000) / duration) * 100}%`, left: 0 }}
-                        />
-                        <div
-                            className="outside-range"
-                            style={{
-                                left: `${((prevSeek[1] / 1000) / duration) * 100}%`,
-                                width: `${100 - (((prevSeek[1] / 1000) / duration) * 100)}%`
-                            }}
-                        />
-                        <p className="time-marker-length">{`${calculateLength(prevSeek[0], prevSeek[1])} sec`}</p>
-                    </div>
-                    {children}
-                </div>
-                <div className="button-box time-marker-apply-selection-wrapper">
-                    <button
-                        onClick={cancelFunction}
-                        className="button secondary-button time-marker-cancel-selection-button"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => timeMarkerButtonFunction(prevSeek, duration)}
-                        className="button primary-button time-marker-apply-selection-button"
-                    >
-                        Apply selection
-                    </button>
                 </div>
             </div>
         );
@@ -276,10 +159,7 @@ class VideoComponent extends Component {
 }
 
 VideoComponent.propTypes = {
-    timeMarkerButtonFunction: PT.func.isRequired,
-    cancelFunction: PT.func.isRequired,
-    children: PT.node.isRequired,
-    imageUrl: PT.string.isRequired,
+    onEndFunction: PT.func.isRequired,
     url: PT.string.isRequired,
     startTime: PT.number,
     endTime: PT.number

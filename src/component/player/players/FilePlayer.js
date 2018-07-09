@@ -171,7 +171,7 @@ export default class FilePlayer extends Component {
     }
 
     render() {
-        const { url, loop, controls, config, width, height } = this.props;
+        const { url, controls, config, width, height } = this.props;
         const useAudio = this.shouldUseAudio(this.props);
         const useHLS = this.shouldUseHLS(url);
         const useDASH = this.shouldUseDASH(url);
@@ -189,7 +189,6 @@ export default class FilePlayer extends Component {
                 preload="auto"
                 controls={controls}
                 controlsList="nodownload"
-                loop={loop}
                 {...config.file.attributes}
             >
                 {url instanceof Array &&

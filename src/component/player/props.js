@@ -5,7 +5,6 @@ const { string, bool, number, array, oneOfType, shape, object, func } = PropType
 export const propTypes = {
     url: oneOfType([string, array]),
     playing: bool,
-    loop: bool,
     controls: bool,
     volume: number,
     muted: bool,
@@ -64,7 +63,6 @@ export const propTypes = {
 
 export const defaultProps = {
     playing: false,
-    loop: false,
     controls: false,
     volume: 0.8,
     muted: false,

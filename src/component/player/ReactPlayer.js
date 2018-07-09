@@ -130,7 +130,7 @@ export default class ReactPlayer extends Component {
     render() {
         const { url, style, width, height } = this.props;
         const otherProps = omit(this.props, SUPPORTED_PROPS, DEPRECATED_CONFIG_PROPS);
-        const { prevSeek, isReady, startLoop, ...playerProps } = otherProps;
+        const { prevSeek, isReady, ...playerProps } = otherProps;
         const activePlayer = this.renderActivePlayer(url);
         return (
             <div ref={this.wrapperRef} style={{ ...style, width, height }} {...playerProps}>

@@ -71,11 +71,7 @@ export default class Player extends Component {
           newEnd = this.props.prevSeek[1] / 1000.0;
       }
       if ((currentTime) > newEnd) {
-          const timeFraction = parseFloat(this.props.prevSeek[0]);
-          const seekTo = timeFraction / (this.getDuration() * 1000);
-          this.seekTo(seekTo);
-          this.props.startLoop(seekTo);
-          this.onPlay();
+          this.onEnded();
           return this.player.getCurrentTime();
       }
       return currentTime;
@@ -150,9 +146,6 @@ export default class Player extends Component {
   };
   onEnded = () => {
       const { onEnded } = this.props;
-      const timeFraction = parseFloat(this.props.prevSeek[0]);
-      const seekTo = timeFraction / (this.getDuration() * 1000);
-      this.seekTo(seekTo);
       this.onPlay();
       onEnded();
   };
