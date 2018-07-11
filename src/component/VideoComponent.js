@@ -11,6 +11,7 @@ class VideoComponent extends Component {
     constructor(props) {
         super(props);
         this.load = this.load.bind(this);
+        this.onEnded = this.onEnded.bind(this);
     }
     state = {
         url: null,
@@ -19,12 +20,13 @@ class VideoComponent extends Component {
         prevSeek: [0, 100],
         loaded: 0,
         duration: 0,
+        fullEnd: 0,
         playbackRate: 1.0,
         ready: false,
         playedWhenStopped: 0
     };
     componentDidMount() {
-        this.load(this.props.url, this.props.startTime, this.props.endTime);
+        this.load(this.props.url);
     }
     onPlay = () => {
         const { playedWhenStopped, prevSeek, duration } = this.state;
@@ -60,7 +62,8 @@ class VideoComponent extends Component {
                 duration,
                 prevSeek: [prevSeekStart, prevSeekEnd],
                 played: initialPlayed,
-                playing: true
+                playing: true,
+                fullEnd: duration
             });
             this.setState({ seeking: false });
         }
@@ -115,43 +118,47 @@ class VideoComponent extends Component {
         this.player = player;
     };
 
+    onEnded = () => {
+        this.setState({ playing: false });
+        this.player.seekTo(this.state.fullEnd + 100);
+        this.props.onEndFunction();
+    };
+
     render() {
         const { url, playing, prevSeek, playbackRate, fileConfig } = this.state;
         return (
-            <div className="time-marker-modal-content">
-                <div className="time-marker-content">
-                    <div className="player-wrapper">
-                        <ReactPlayer
-                            ref={this.ref}
-                            className="react-player"
-                            width="100%"
-                            height="100%"
-                            url={url}
-                            playing={playing}
-                            playbackRate={playbackRate}
-                            volume={0.8}
-                            muted={false}
-                            seeking={this.state.seeking}
-                            prevSeek={prevSeek}
-                            fileConfig={fileConfig}
-                            isReady={this.isReady}
-                            onPlay={this.onPlay}
-                            onPause={this.onPause}
-                            onProgress={this.onProgress}
-                            onEnded={this.props.onEndFunction}
-                            onDuration={newDuration => this.setState({ duration: newDuration })}
-                        />
-                        <button className="time-marker-play-button" onClick={this.playPause}>
-                            <div className="time-marker-button-content-wrapper">
-                                <div className={classnames('time-marker-button-icon', { 'pause-button': playing })}>
-                                    {playing ?
-                                        <i className="material-icons">pause</i> :
-                                        <i className="material-icons">play_arrow</i>
-                                    }
-                                </div>
+            <div className="slideshow-video-wrapper">
+                <div className="player-wrapper">
+                    <ReactPlayer
+                        ref={this.ref}
+                        className="react-player"
+                        width="100%"
+                        height="100%"
+                        url={url}
+                        playing={playing}
+                        playbackRate={playbackRate}
+                        volume={0.8}
+                        muted={false}
+                        seeking={`${this.state.seeking}`}
+                        prevSeek={prevSeek}
+                        fileConfig={fileConfig}
+                        isReady={this.isReady}
+                        onPlay={this.onPlay}
+                        onPause={this.onPause}
+                        onProgress={this.onProgress}
+                        onEnded={this.onEnded}
+                        onDuration={newDuration => this.setState({ duration: newDuration })}
+                    />
+                    <button className="slideshow-play-button" onClick={this.playPause}>
+                        <div className="slideshow-button-content-wrapper">
+                            <div className={classnames('slideshow-button-icon', { 'pause-button': playing })}>
+                                {playing ?
+                                    <i className="material-icons">pause</i> :
+                                    <i className="material-icons">play_arrow</i>
+                                }
                             </div>
-                        </button>
-                    </div>
+                        </div>
+                    </button>
                 </div>
             </div>
         );

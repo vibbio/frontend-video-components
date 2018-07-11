@@ -70,9 +70,9 @@ export default class Player extends Component {
       if (this.props.prevSeek && this.props.prevSeek[1]) {
           newEnd = this.props.prevSeek[1] / 1000.0;
       }
-      if ((currentTime) > newEnd) {
+      if ((currentTime) > newEnd && this.props.playing) {
           this.onEnded();
-          return this.player.getCurrentTime();
+          return currentTime;
       }
       return currentTime;
   }
@@ -144,9 +144,13 @@ export default class Player extends Component {
       this.isPlaying = false;
       this.props.onPause();
   };
+  endDurationCheckTimeout = () => {
+      clearTimeout(this.durationCheckTimeout);
+  }
   onEnded = () => {
       const { onEnded } = this.props;
       this.onPlay();
+      this.endDurationCheckTimeout();
       onEnded();
   };
   onDurationCheck = () => {

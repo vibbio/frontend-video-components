@@ -150,7 +150,7 @@ export default class FilePlayer extends Component {
     }
 
     getCurrentTime() {
-        return this.player.currentTime;
+        return this.player ? this.player.currentTime : 0;
     }
 
     getSecondsLoaded() {
