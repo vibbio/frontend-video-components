@@ -1,7 +1,9 @@
-Time marker
+Slideshow player
 ===========
 
 ### Usage
+
+Play the file on the url from start to end and call onEndFunction when it has reached the end.
 
 The component is exported from VideoComponent. 
 
@@ -12,7 +14,7 @@ Prop | Description
 `url` | Contains the url of the video to play
 `startTime` | The start time of the video. Undefined if the video does not have a startTime (assumes 0)
 `endTime` | The end time of the video. Undefined if hte video does not have a endTime (assumes length of video)
-`timeMarkerButtonFunction` | The callback function. Input to the function is [startTime, currentPlayTime, endTime] and length 
+`onEndFunction` | The function is called when the selected time span is played
 
 
 ## Run local
