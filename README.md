@@ -59,37 +59,5 @@ It could be smart to add some state information to the VideoComponent when worki
 </table>
 ```
 
-## Build and publish
-
-Instructions to build and publish the package to VIBBIO npm registry.
-Instructions is also found [here](https://docs.google.com/document/d/1m3W3AljdX4-E4U9GkLwl9iUlWsJa0Kj1mxvEjWaQpAk/edit?usp=sharing).
-
-1. Make sure you have access to the npm registry: 
-```
-npm login -registry=https://registry.npmjs.org/ -scope=@vibbio
-```
-2. Add the log in details
-
-Username: vibbio
-
-Password: FollowTheNpm123
-
-Email: (this IS public) tech@vibbio.com
-
-
-3. Update the version in package.json and delete `/styling` in `/lib`
-
-```
-npm i
-```
-
-4. Commit your new version
-
-5. Publish your new version to npm
-```
-npm publish
-```
-
-
 ### Documentation
 The time marker is based on [react-player](https://github.com/CookPete/react-player) and [rc-slider](https://github.com/react-component/slider).
