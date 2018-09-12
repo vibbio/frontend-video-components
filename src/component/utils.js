@@ -1,12 +1,7 @@
-import moment from 'moment/moment';
+import format from 'date-fns/format';
 
-export const prettyPrintTimeStamp = (ms) => {
-    const tempTime = moment.duration(Math.round(ms));
-    if (tempTime.hours() > 0) {
-        return moment(ms).format('hh:mm:ss.SS');
-    }
-    return moment(ms).format('mm:ss.SS');
-};
+const ONE_HOUR = 1000 * 60 * 60;
+export const prettyPrintTimeStamp = (ms) => format(ms, `${ms > ONE_HOUR ? 'hh:' : ''}mm:ss.SS`)
 
 export const calculateLength = (start, end) => {
     const length = (end - start) / 1000;
