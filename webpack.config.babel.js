@@ -36,15 +36,6 @@ export default {
         test: /\.js$/,
         loader: 'babel-loader',
         include: [ PATH_SRC, PATH_TESTS ]
-      },
-      {
-        test: /\.scss$/,
-        use: styleLoader([
-          'style-loader',
-          'css-loader?sourceMap',
-          'sass-loader?sourceMap'
-        ]),
-        include: PATH_SRC
       }
     ]
   },
