@@ -28,15 +28,6 @@
   "author": "Pete Cook <pete@cookpete.com> (http://github.com/cookpete)",
   "license": "CC0-1.0",
   "homepage": "https://github.com/CookPete/react-player",
-  "peerDependencies": {
-    "classnames": "*",
-    "prop-types": "*",
-    "rc-util": "*",
-    "react": "*",
-    "screenfull": "*",
-    "shallowequal": "*",
-    "warning": "*"
-  },
   "devDependencies": {
     "auto-changelog": "^1.7.1",
     "babel-cli": "^6.26.0",
@@ -80,7 +71,7 @@
     "react-hot-loader": "3.1.1",
     "rimraf": "^2.5.4",
     "sass-loader": "^6.0.7",
-    "screenfull": "^3.0.2",
+    "screenfull": "^3.3.3",
     "snazzy": "^7.1.1",
     "standard": "^10.0.0",
     "style-loader": "^0.19.1",
@@ -92,11 +83,7 @@
     "classnames": "^2.2.6",
     "deepmerge": "^2.1.1",
     "load-script": "^1.0.0",
-    "prop-types": "^15.6.2",
-    "rc-tooltip": "^3.7.2",
-    "rc-util": "^4.5.1",
-    "shallowequal": "^1.0.2",
-    "warning": "^3.0.0"
+    "prop-types": "^15.6.2"
   },
   "babel": {
     "presets": [
