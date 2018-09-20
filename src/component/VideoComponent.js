@@ -53,6 +53,13 @@ class VideoComponent extends Component {
         ];
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
+    lastSeek = 0
+    throttledSeek = (seconds) => {
+        const now = Date.now()
+        if (now - this.lastSeek < 100) return
+        this.lastSeek = now
+        setTimeout(() => this.player.seekTo(seconds), 0)
+    }
     onSeekChange = (e) => {
         const seekStart = e[0];
         const seekEnd = e[1];
@@ -68,10 +75,13 @@ class VideoComponent extends Component {
 
         if (seekStart !== prevSeekStart) {
             updatedPrevSeek[0] = seekStart;
+            this.throttledSeek(seekStart / (this.state.duration * 1000))
         } else if (seekEnd !== prevSeekEnd) {
             updatedPrevSeek[1] = seekEnd;
+            this.throttledSeek(seekEnd / (this.state.duration * 1000))
         }
-        this.setState({ seeking: true, prevSeek: updatedPrevSeek });
+        
+        this.setState({ seeking: true, playing: false, prevSeek: updatedPrevSeek });
     };
     onSeekMouseUp = () => {
         const { prevSeek, duration, played } = this.state;
