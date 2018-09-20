@@ -25,9 +25,6 @@
     "url": "https://github.com/CookPete/react-player/issues"
   },
   "homepage": "https://github.com/CookPete/react-player",
-  "peerDependencies": {
-    "react": "*"
-  },
   "devDependencies": {
     "auto-changelog": "^1.1.0",
     "babel-cli": "^6.26.0",
