@@ -54,19 +54,18 @@ class VideoComponent extends Component {
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
     lastSeek = 0
-    throttledSeek = (seconds) => {
+    throttledSeek = (seekToPercent) => {
         const now = Date.now()
         if (now - this.lastSeek < 100) return
         this.lastSeek = now
-        setTimeout(() => this.player.seekTo(seconds), 0)
+        setTimeout(() => {
+            this.player.seekTo(seekToPercent)
+            this.setState({ played: seekToPercent });
+        }, 0)
     }
-    onSeekChange = (e) => {
-        const seekStart = e[0];
-        const seekEnd = e[1];
-
+    onSeekChange = ([ seekStart, seekEnd ]) => {
         const { prevSeek } = this.state;
-        const prevSeekStart = prevSeek[0];
-        const prevSeekEnd = prevSeek[1];
+        const [ prevSeekStart, prevSeekEnd ] = prevSeek;
 
         const updatedPrevSeek = [
             prevSeekStart,
@@ -83,28 +82,8 @@ class VideoComponent extends Component {
         
         this.setState({ seeking: true, playing: false, prevSeek: updatedPrevSeek });
     };
-    onSeekMouseUp = () => {
-        const { prevSeek, duration, played } = this.state;
-        const prevSeekStart = prevSeek[0];
-        const prevSeekEnd = prevSeek[1];
-        const timeFractionStart = parseFloat(prevSeekStart);
-        const seekToStart = timeFractionStart / (duration * 1000);
-
-        const timeFractionEnd = parseFloat(prevSeekEnd);
-        const seekToEnd = timeFractionEnd / (duration * 1000);
-
-        const startDiff = Math.abs(played - seekToStart);
-        const endDiff = Math.abs(played - seekToEnd);
-        if (endDiff > startDiff) {
-            this.player.seekTo(seekToEnd);
-            this.setState({ seeking: false, playing: false, played: seekToEnd });
-            return;
-        }
-
-        this.player.seekTo(seekToStart);
-        this.setState({ seeking: false, playing: false, played: seekToStart });
-
-    };
+    
+    onSeekMouseUp = () => this.setState({ seeking: false })
 
     setVolume = (e) => {
         this.setState({ volume: parseFloat(e.target.value) });

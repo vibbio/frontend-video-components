@@ -97,7 +97,7 @@ export default class Player extends Component {
           }, SEEK_ON_PLAY_EXPIRY);
           return;
       }
-      if (amount > 0 && amount < 1) {
+      if (amount > 0 && amount <= 1) {
       // Convert fraction to seconds based on duration
           const duration = this.player.getDuration();
           if (!duration) {
