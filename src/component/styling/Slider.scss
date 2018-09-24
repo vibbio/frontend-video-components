@@ -26,7 +26,9 @@
   box-sizing: border-box;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   background-size: 100% 70px, cover;
-  height: 70px;
+  height: 30px;
+  margin-bottom: 30px;
+  background-color: #00576F;
 }
 .rc-slider * {
   box-sizing: border-box;
@@ -51,20 +53,33 @@
   cursor: grab;
   -ms-touch-action: pan-x;
   touch-action: pan-x;
-  top: -7px;
-  width: 12px;
-  height: 80px;
-  margin: 0 -6px;
+  top: -3px;
+  width: 10px;
+  height: 36px;
+  margin: 0 -4px;
 }
 .rc-slider-handle-1 {
-  background: url('https://storage.googleapis.com/vibbio/drag_handle_left.png') no-repeat;
+  background: url('https://storage.googleapis.com/vibbio/handle.svg') no-repeat;
   background-size: cover;
+}
+.rc-slider-handle-1 + .handle-value {
+  border-bottom-left-radius: 6px;
+  border-top-left-radius: 6px;
+  left: -54px;
 }
 
 .rc-slider-handle-2 {
-  background: url('https://storage.googleapis.com/vibbio/drag_handle_right.png') no-repeat;
+  background: url('https://storage.googleapis.com/vibbio/handle.svg') no-repeat;
   background-size: cover;
+  transform-origin: center;
+  transform: scale(-1, 1);
 }
+.rc-slider-handle-2 + .handle-value {
+  border-bottom-right-radius: 6px;
+  border-top-right-radius: 6px;
+  left: -4px;
+}
+
 .rc-slider-handle:hover {
   border-color: #57c5f7;
 }
@@ -110,17 +125,18 @@
 }
 
 .handle-value {
-  background: rgba(38, 54, 69, 0.5);
-  height: 25px;
-  min-width: 60px;
+  background: #25cbd3;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: 26px;
-  left: -31px;
-  border-radius: 3px;
-  color: white;
+  top: 30px;
+  font-size: 11px;
+  font-weight: bold;
+  z-index: -1;
+  width: 60px;
+  color: #141D28;
   cursor: -webkit-grab;
   cursor: grab;
 }
@@ -138,17 +154,24 @@
 
 .played-marker {
   position: absolute;
-  top: -5px;
-  height: 80px;
+  top: 0px;
+  height: 30px;
   width: 2px;
-  background: #25CBD3;
+  background: white;
   z-index: 3;
   visibility: visible;
 }
 
 .outside-range {
   background: rgba(#25CBD3, 0.7);
-  height: 70px;
+  height: 30px;
   position: absolute;
   top: 0;
+}
+
+.time-marker-content .slider-wrapper .time-marker-length {
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  float: none;
 }
