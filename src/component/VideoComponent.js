@@ -204,8 +204,8 @@ class VideoComponent extends Component {
                         />
                         <button className="time-marker-play-button" onClick={this.playPause}>
                             <div className="time-marker-button-content-wrapper">
-                                <div className={classnames('time-marker-button-icon', { 'pause-button': playing })}>
-                                    {playing ?
+                                <div className={classnames('time-marker-button-icon', { 'pause-button': playing || this.state.seeking })}>
+                                    {playing || this.state.seeking ?
                                         <i className="material-icons">pause</i> :
                                         <i className="material-icons">play_arrow</i>
                                     }
