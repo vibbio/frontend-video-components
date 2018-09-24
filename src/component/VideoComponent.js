@@ -191,7 +191,7 @@ class VideoComponent extends Component {
     };
 
     render() {
-        const { imageUrl, timeMarkerButtonFunction, cancelFunction, children } = this.props;
+        const { timeMarkerButtonFunction, cancelFunction, children } = this.props;
         const {
             url, playing, volume, muted, prevSeek, duration, playbackRate,
             played, fileConfig, ready, playedWhenStopped
@@ -246,7 +246,6 @@ class VideoComponent extends Component {
                                 prevSeek={[prevSeek[0], prevSeek[1]]}
                             />
                         ) : <noscript />}
-                        <img src={imageUrl} role="presentation" className="image-strip" />
                         <div
                             className="played-marker"
                             style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
@@ -289,7 +288,6 @@ VideoComponent.propTypes = {
     timeMarkerButtonFunction: PT.func.isRequired,
     cancelFunction: PT.func.isRequired,
     children: PT.node.isRequired,
-    imageUrl: PT.string.isRequired,
     url: PT.string.isRequired,
     startTime: PT.number,
     endTime: PT.number
