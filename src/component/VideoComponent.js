@@ -137,9 +137,9 @@ class VideoComponent extends Component {
         this.setState({ playing: true, played: seekTo, seeking: false });
     };
     onSeeking = () => {
-        if (this.state.stalled) this._seekBackoff += 100;
+        if (this.state.stalled) this._seekBackoff += 200;
         if (this._seekTimeout) return;
-        this._seekTimeout = setTimeout(this.onSeekingStalled, 1000);
+        this._seekTimeout = setTimeout(this.onSeekingStalled, 2000);
     };
     onResolveStall = () => {
         if (this._seekTimeout) {
@@ -207,7 +207,7 @@ class VideoComponent extends Component {
                     <div className="player-wrapper">
                         <ReactPlayer
                             ref={this.ref}
-                            className="react-player"
+                            className={classnames('react-player', { stalled: this.state.stalled })}
                             width="100%"
                             height="100%"
                             url={url}
