@@ -58,6 +58,8 @@
 }
 
 .react-player {
+  background-color: black;
+  
   &:before {
     position: absolute;
     content: '';
@@ -75,5 +77,11 @@
     background-size: 150px;
     background-position: center;
     background-repeat: no-repeat;
+  }
+  
+  video {
+    max-height: 50vh;
+    max-width: 100%;
+    display: block;
   }
 }
