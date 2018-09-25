@@ -59,7 +59,6 @@
 
 .react-player {
   background-color: black;
-  
   &:before {
     position: absolute;
     content: '';
@@ -85,5 +84,13 @@
     max-height: 50vh;
     max-width: 100%;
     display: block;
+  }
+  
+  &.player-dummy {
+    &:after {
+      content: '';
+      padding-top: 56.25%;
+      display: block;
+    }
   }
 }

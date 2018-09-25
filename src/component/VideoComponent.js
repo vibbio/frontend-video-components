@@ -205,7 +205,8 @@ class VideoComponent extends Component {
             <div className="time-marker-modal-content">
                 <div className="time-marker-content">
                     <div className="player-wrapper">
-                        <ReactPlayer
+                        { url ? (
+                            <ReactPlayer
                             ref={this.ref}
                             className={classnames('react-player', { 
                                 'stalled': this.state.stalled,
@@ -230,8 +231,8 @@ class VideoComponent extends Component {
                             onStalled={this.onStalled}
                             onPlaying={this.onResolveStall}
                             onSeeked={this.onResolveStall}
-                            onDuration={newDuration => this.setState({ duration: newDuration })}
-                        />
+                            onDuration={newDuration => this.setState({ duration: newDuration })} />
+                        ) : <div className="player-dummy react-player not-ready" /> }
                         { ready ? (
                             <button className="time-marker-play-button" onClick={this.playPause}>
                                 <div className="time-marker-button-content-wrapper">
@@ -303,7 +304,7 @@ VideoComponent.propTypes = {
     timeMarkerButtonFunction: PT.func.isRequired,
     cancelFunction: PT.func.isRequired,
     children: PT.node.isRequired,
-    url: PT.string.isRequired,
+    url: PT.string,
     startTime: PT.number,
     endTime: PT.number
 };
