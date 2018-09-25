@@ -134,6 +134,22 @@ class VideoComponent extends Component {
         this.player.seekTo(seekTo);
         this.setState({ playing: true, played: seekTo, seeking: false });
     };
+    onSeeking = () => {
+        if (this._seekTimeout) return;
+        this._seekTimeout = setTimeout(this.onStalled, 1000);
+    };
+    onResolveStall = () => {
+        if (this._seekTimeout) {
+            window.clearTimeout(this._seekTimeout);
+            delete this._seekTimeout;
+        }
+        if (this.state.stalled) {
+            this.setState({ stalled: false })
+        }
+    };
+    onStalled = () => {
+        this.setState({ stalled: true });
+    };
     stop = () => {
         this.setState({ url: null, playing: false });
     };
@@ -200,6 +216,10 @@ class VideoComponent extends Component {
                             onPlay={this.onPlay}
                             onPause={this.onPause}
                             onProgress={this.onProgress}
+                            onSeeking={this.onSeeking}
+                            onStalled={this.onStalled}
+                            onPlaying={this.onResolveStall}
+                            onSeeked={this.onResolveStall}
                             onDuration={newDuration => this.setState({ duration: newDuration })}
                         />
                         <button className="time-marker-play-button" onClick={this.playPause}>
