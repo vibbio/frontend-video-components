@@ -68,15 +68,17 @@
     z-index: 5;
     width: 100%;
     height: 100%;
-  }
-  &.stalled:before {
-    transition: opacity 750ms ease-out;
-    opacity: 1;
     background-color: rgba(0,0,0,0.5);
+  }
+  &.stalled:before, &.not-ready:before {
+    opacity: 1;
     background-image: url(https://storage.googleapis.com/vibbio/spinner.gif);
     background-size: 150px;
     background-position: center;
     background-repeat: no-repeat;
+  }
+  &.stalled:before {
+    transition: opacity 750ms ease-out;
   }
   
   video {

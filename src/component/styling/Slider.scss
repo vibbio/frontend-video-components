@@ -175,3 +175,28 @@
   text-align: center;
   float: none;
 }
+
+.range-dummy {
+  position: relative;
+  width: 100%;
+  border-radius: 3px;
+  height: 30px;
+  margin-bottom: 30px;
+  animation-duration: 1.8s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: loadingGradient;
+  animation-timing-function: linear;
+  background: #f6f7f8;
+  background: linear-gradient(to right, #00576F 8%, #00849c 38%, #00576F 54%);
+  background-size: 1000px 640px;
+}
+
+@keyframes loadingGradient {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}

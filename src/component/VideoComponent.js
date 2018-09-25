@@ -207,7 +207,10 @@ class VideoComponent extends Component {
                     <div className="player-wrapper">
                         <ReactPlayer
                             ref={this.ref}
-                            className={classnames('react-player', { stalled: this.state.stalled })}
+                            className={classnames('react-player', { 
+                                'stalled': this.state.stalled,
+                                'not-ready': !this.state.ready
+                            })}
                             width="100%"
                             height="100%"
                             url={url}
@@ -229,16 +232,18 @@ class VideoComponent extends Component {
                             onSeeked={this.onResolveStall}
                             onDuration={newDuration => this.setState({ duration: newDuration })}
                         />
-                        <button className="time-marker-play-button" onClick={this.playPause}>
-                            <div className="time-marker-button-content-wrapper">
-                                <div className={classnames('time-marker-button-icon', { 'pause-button': playing || this.state.seeking })}>
-                                    {playing || this.state.seeking ?
-                                        <i className="material-icons">pause</i> :
-                                        <i className="material-icons">play_arrow</i>
-                                    }
+                        { ready ? (
+                            <button className="time-marker-play-button" onClick={this.playPause}>
+                                <div className="time-marker-button-content-wrapper">
+                                    <div className={classnames('time-marker-button-icon', { 'pause-button': playing || this.state.seeking })}>
+                                        {playing || this.state.seeking ?
+                                            <i className="material-icons">pause</i> :
+                                            <i className="material-icons">play_arrow</i>
+                                        }
+                                    </div>
                                 </div>
-                            </div>
-                        </button>
+                            </button>
+                        ) : null }
                     </div>
                     <div className="slider-wrapper">
                         {ready ? (
@@ -251,11 +256,15 @@ class VideoComponent extends Component {
                                 onMouseUp={this.onSeekMouseUp}
                                 prevSeek={[prevSeek[0], prevSeek[1]]}
                             />
-                        ) : <noscript />}
-                        <div
-                            className="played-marker"
-                            style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
-                        />
+                        ) : (
+                            <div className="range-dummy" />
+                        )}
+                        { ready ? (
+                            <div
+                                className="played-marker"
+                                style={{ left: `${playing ? played * 100 : playedWhenStopped * 100}%` }}
+                            />
+                        ) : null }
                         <div
                             className="outside-range"
                             style={{ width: `${((prevSeek[0] / 1000) / duration) * 100}%`, left: 0 }}
