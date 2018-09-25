@@ -290,7 +290,6 @@ class Range extends React.Component {
                 }),
                 offset,
                 value: v,
-                dragging,
                 index: i,
                 min,
                 max,

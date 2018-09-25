@@ -199,7 +199,6 @@ class VideoComponent extends Component {
                             playbackRate={playbackRate}
                             volume={volume}
                             muted={muted}
-                            seeking={this.state.seeking}
                             prevSeek={prevSeek}
                             config={{ file: { attributes: { poster: thumbnail } } }}
                             isReady={this.isReady}
