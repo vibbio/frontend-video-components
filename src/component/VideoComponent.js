@@ -75,14 +75,6 @@ class VideoComponent extends Component {
     };
     
     onSeekMouseUp = () => this.setState({ seeking: false })
-
-    setVolume = (e) => {
-        this.setState({ volume: parseFloat(e.target.value) });
-    };
-
-    setPlaybackRate = (e) => {
-        this.setState({ playbackRate: parseFloat(e.target.value) });
-    };
     startLoop = (loopStart) => {
         this.setState({ played: loopStart });
     };
@@ -154,19 +146,6 @@ class VideoComponent extends Component {
         if (!this.state.seeking) {
             this.setState(state);
         }
-    };
-    onClickFullscreen = () => {
-        screenfull.request(findDOMNode(this.player));
-    };
-    onConfigSubmit = () => {
-        let config;
-        try {
-            config = JSON.parse(this.configInput.value);
-        } catch (error) {
-            config = {};
-            console.error('Error setting config:', error);
-        }
-        this.setState(config);
     };
     ref = (player) => {
         this.player = player;
