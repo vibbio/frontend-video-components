@@ -10,29 +10,18 @@ import './styling/index.scss';
 import { calculateLength } from './utils';
 
 class VideoComponent extends Component {
-    constructor(props) {
-        super(props);
-        this.load = this.load.bind(this);
-        this.onSeekMouseDown = this.onSeekMouseDown.bind(this);
-        this.onSeekMouseUp = this.onSeekMouseUp.bind(this);
-        this.startLoop = this.startLoop.bind(this);
-    }
     state = {
-        url: null,
         playing: false,
         volume: 0.8,
         muted: false,
         played: 0,
-        prevSeek: [0, 100],
+        prevSeek: [null, null],
         loaded: 0,
         duration: 0,
         playbackRate: 1.0,
         ready: false,
         playedWhenStopped: 0
     };
-    componentDidMount() {
-        this.load(this.props.url, this.props.startTime, this.props.endTime);
-    }
     onPlay = () => {
         const { playedWhenStopped, prevSeek, duration } = this.state;
         const playedWhenStoppedMilli = playedWhenStopped * duration * 1000;
@@ -157,17 +146,8 @@ class VideoComponent extends Component {
     onStalled = () => {
         this.setState({ stalled: true });
     };
-    stop = () => {
-        this.setState({ url: null, playing: false });
-    };
     toggleMuted = () => {
         this.setState({ muted: !this.state.muted });
-    };
-    load = (url) => {
-        this.setState({
-            url,
-            loaded: 0
-        });
     };
     onProgress = (state) => {
         // We only want to update time slider if we are not currently seeking
@@ -193,10 +173,10 @@ class VideoComponent extends Component {
     };
 
     render() {
-        const { timeMarkerButtonFunction, cancelFunction, children } = this.props;
+        const { timeMarkerButtonFunction, cancelFunction, children, url, thumbnail } = this.props;
         const {
-            url, playing, volume, muted, prevSeek, duration, playbackRate,
-            played, fileConfig, ready, playedWhenStopped
+            playing, volume, muted, prevSeek, duration, playbackRate,
+            played, ready, playedWhenStopped
         } = this.state;
 
         const maxValue = Math.floor(duration ? duration * 1000 : 10000);
@@ -221,7 +201,7 @@ class VideoComponent extends Component {
                             muted={muted}
                             seeking={this.state.seeking}
                             prevSeek={prevSeek}
-                            fileConfig={fileConfig}
+                            config={{ file: { attributes: { poster: thumbnail } } }}
                             isReady={this.isReady}
                             startLoop={this.startLoop}
                             onPlay={this.onPlay}
