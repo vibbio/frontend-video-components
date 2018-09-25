@@ -47,17 +47,19 @@ class VideoComponent extends Component {
     };
     onSeekMouseDown = () => {
         this.onPause();
+        this._seekBackoff = 100;
         const updatedPrevSeek = [
             this.state.prevSeek[0],
             this.state.prevSeek[1]
         ];
         this.setState({ seeking: true, prevSeek: updatedPrevSeek });
     };
-    lastSeek = 0
+    _lastSeek = 0;
+    _seekBackoff = 100;
     throttledSeek = (seekToPercent) => {
         const now = Date.now()
-        if (now - this.lastSeek < 100) return
-        this.lastSeek = now
+        if (now - this._lastSeek < this._seekBackoff) return
+        this._lastSeek = now
         setTimeout(() => {
             this.player.seekTo(seekToPercent)
             this.setState({ played: seekToPercent });
@@ -135,8 +137,9 @@ class VideoComponent extends Component {
         this.setState({ playing: true, played: seekTo, seeking: false });
     };
     onSeeking = () => {
+        if (this.state.stalled) this._seekBackoff += 100;
         if (this._seekTimeout) return;
-        this._seekTimeout = setTimeout(this.onStalled, 1000);
+        this._seekTimeout = setTimeout(this.onSeekingStalled, 1000);
     };
     onResolveStall = () => {
         if (this._seekTimeout) {
@@ -144,9 +147,13 @@ class VideoComponent extends Component {
             delete this._seekTimeout;
         }
         if (this.state.stalled) {
+            this._seekBackoff = 100;
             this.setState({ stalled: false })
         }
     };
+    onSeekingStalled = () => {
+        this.onStalled();
+    }
     onStalled = () => {
         this.setState({ stalled: true });
     };
