@@ -1,6 +1,6 @@
 {
   "name": "@vibbio/time-marker",
-  "version": "0.1.26",
+  "version": "0.2.0",
   "description": "A react component for playing a variety of URLs, including file paths, YouTube, Facebook, SoundCloud, Streamable, Vidme, Vimeo and Wistia",
   "main": "lib/component/VideoComponent.js",
   "files": [
